@@ -28,7 +28,7 @@ export default function RepairCard({ job }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className={`overflow-hidden hover:shadow-md transition-shadow ${isPro ? 'border-destructive/30' : ''}`}>
+      <Card className={`card-premium overflow-hidden ${isPro ? 'border-destructive/30' : ''}`}>
         <CardContent className="p-4">
           {/* Safety Warning */}
           {job.safety_warning && (

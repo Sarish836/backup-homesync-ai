@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Palette, Settings, Bell, Check, LogOut, MapPin, Phone, Mail } from 'lucide-react';
+import { User, Palette, Settings, Bell, Check, LogOut, MapPin, Phone, Mail, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { THEMES } from '../hooks/useTheme';
+import { ACCENT_OPTIONS } from '../hooks/useTheme';
 
 const AVATAR_COLORS = ['#2d9b6f', '#2e86c1', '#e67e22', '#8e44ad', '#c0392b', '#27ae60', '#d35400', '#2980b9'];
 const FONT_SIZES = [
@@ -96,11 +96,35 @@ export default function Profile() {
         <p className="text-sm text-muted-foreground mt-0.5">Customize your MyHomeAI experience</p>
       </div>
 
+      {/* Dark Mode Toggle */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        className="card-premium bg-card rounded-2xl border border-border/50 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{background:'linear-gradient(135deg,hsl(var(--primary)/0.15),hsl(var(--accent)/0.1))'}}>
+              {profile?.dark_mode ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-primary" />}
+            </div>
+            <div>
+              <p className="font-semibold text-sm text-foreground">{profile?.dark_mode ? 'Dark Mode' : 'Light Mode'}</p>
+              <p className="text-xs text-muted-foreground">Toggle appearance</p>
+            </div>
+          </div>
+          <button
+            onClick={() => handleSave({ dark_mode: !profile?.dark_mode })}
+            className={`relative h-7 w-13 rounded-full transition-all duration-300 ${profile?.dark_mode ? 'glow-sm' : ''}`}
+            style={{width:'52px', background: profile?.dark_mode ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
+          >
+            <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300 ${profile?.dark_mode ? 'translate-x-7' : 'translate-x-1'}`} />
+          </button>
+        </div>
+      </motion.div>
+
       {/* Avatar + Identity */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-card rounded-2xl border border-border/50 p-5 flex items-center gap-4">
+        className="card-premium bg-card rounded-2xl border border-border/50 p-5 flex items-center gap-4"
+        style={{background:'linear-gradient(135deg,hsl(var(--card)),hsl(var(--primary)/0.04))'}}>
         <div
-          className="h-16 w-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold font-heading shrink-0"
+          className="h-16 w-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold font-heading shrink-0 glow-primary"
           style={{ background: avatarColor }}
         >
           {initials}
@@ -170,21 +194,23 @@ export default function Profile() {
         </div>
       </Section>
 
-      {/* Theme */}
-      <Section icon={Palette} title="Color Theme">
+      {/* Accent Color */}
+      <Section icon={Palette} title="Accent Color">
         <div className="grid grid-cols-3 gap-2">
-          {THEMES.map(t => (
+          {ACCENT_OPTIONS.map(a => (
             <button
-              key={t.id}
-              onClick={() => handleSave({ theme: t.id })}
-              className={`flex items-center gap-2 p-2.5 rounded-xl border text-sm font-medium transition-all ${
-                (profile?.theme || 'default') === t.id
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-border bg-card text-foreground hover:bg-muted/50'
+              key={a.id}
+              onClick={() => handleSave({ theme: a.id })}
+              className={`relative flex items-center gap-2 p-2.5 rounded-xl border text-sm font-semibold transition-all overflow-hidden ${
+                (profile?.theme || 'purple') === a.id
+                  ? 'border-primary text-primary'
+                  : 'border-border text-foreground hover:border-primary/40'
               }`}
+              style={(profile?.theme || 'purple') === a.id ? {background:`linear-gradient(135deg,${a.color}18,${a.color}08)`,borderColor:a.color} : {}}
             >
-              <span className="h-4 w-4 rounded-full shrink-0" style={{ background: t.color }} />
-              {t.label}
+              <span className={`h-5 w-5 rounded-full shrink-0 bg-gradient-to-br ${a.gradient}`} />
+              {a.label}
+              {(profile?.theme || 'purple') === a.id && <span className="absolute right-2 text-[10px] text-primary">✓</span>}
             </button>
           ))}
         </div>
@@ -234,7 +260,7 @@ export default function Profile() {
 function Section({ icon: Icon, title, children }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl border border-border/50 p-4">
+      className="card-premium bg-card rounded-2xl border border-border/50 p-4">
       <div className="flex items-center gap-2 mb-4">
         <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
           <Icon className="w-3.5 h-3.5 text-primary" />
@@ -255,9 +281,10 @@ function Toggle({ label, description, value, onChange }) {
       </div>
       <button
         onClick={() => onChange(!value)}
-        className={`relative h-6 w-11 rounded-full transition-colors ${value ? 'bg-primary' : 'bg-muted'}`}
+        className="relative h-6 w-11 rounded-full transition-all duration-300"
+        style={{background: value ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
       >
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300 ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
       </button>
     </div>
   );

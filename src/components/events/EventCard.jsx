@@ -65,7 +65,7 @@ export default function EventCard({ event, homeAddress }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow">
+      <Card className="card-premium overflow-hidden">
         <CardContent className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">

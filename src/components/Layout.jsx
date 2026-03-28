@@ -28,7 +28,7 @@ function ThemedLayout() {
       return list[0] || null;
     },
   });
-  useTheme(profile?.theme || 'default');
+  useTheme(profile?.theme || 'purple', profile?.dark_mode || false);
 
   const needsOnboarding = !profileLoading && !profile?.username && !profile?.home_address && !profile?.skip_address;
   const isAdmin = currentUser && ADMIN_EMAILS.includes(currentUser.email);
@@ -49,13 +49,13 @@ function ThemedLayout() {
   return (
     <div className="min-h-screen bg-background font-body flex flex-col" style={{ fontSize }}>
       {needsOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
-      <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border/50">
+      <header className="sticky top-0 z-40 glass border-b border-border/40">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-heading font-bold text-sm">HS</span>
+          <div className="h-9 w-9 rounded-xl glow-sm flex items-center justify-center" style={{background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))'}}>
+            <span className="text-white font-heading font-bold text-sm">M</span>
           </div>
           <div>
-            <h1 className="font-heading font-bold text-lg leading-tight text-foreground">MyHomeAI</h1>
+            <h1 className="font-heading font-bold text-lg leading-tight text-gradient">MyHomeAI</h1>
             <p className="text-[11px] text-muted-foreground leading-tight">Your smart home assistant</p>
           </div>
         </div>
@@ -65,7 +65,7 @@ function ThemedLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/40">
         <div className="max-w-2xl mx-auto flex">
           {tabs.map(({ path, icon: Icon, label }) => {
             const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
@@ -73,14 +73,12 @@ function ThemedLayout() {
               <Link
                 key={path}
                 to={path}
-                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
-                  isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               >
-                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/10' : ''}`}>
+                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'nav-active-glow' : ''}`}>
                   <Icon className="w-5 h-5" strokeWidth={isActive ? 2.2 : 1.8} />
                 </div>
-                <span className={`text-[11px] font-medium ${isActive ? 'font-semibold' : ''}`}>{label}</span>
+                <span className={`text-[11px] font-medium ${isActive ? 'font-semibold text-gradient' : ''}`}>{label}</span>
               </Link>
             );
           })}

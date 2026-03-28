@@ -37,14 +37,18 @@
     "theme": {
       "type": "string",
       "enum": [
-        "default",
-        "ocean",
-        "sunset",
-        "forest",
-        "midnight",
-        "rose"
+        "purple",
+        "blue",
+        "teal",
+        "orange",
+        "rose",
+        "lime"
       ],
-      "description": "UI color theme"
+      "description": "Accent color theme"
+    },
+    "dark_mode": {
+      "type": "boolean",
+      "description": "Dark mode enabled"
     },
     "font_size": {
       "type": "string",

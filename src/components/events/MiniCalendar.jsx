@@ -19,7 +19,7 @@ export default function MiniCalendar({ events = [], selectedDate, onSelectDate }
   const hasEvent = (day) => eventDates.some(d => isSameDay(d, day));
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-4">
+    <div className="card-premium bg-card rounded-2xl border border-border/50 p-4">
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={() => setViewDate(d => subMonths(d, 1))}

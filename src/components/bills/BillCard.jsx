@@ -35,7 +35,7 @@ export default function BillCard({ bill }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow">
+      <Card className="card-premium overflow-hidden">
         <CardContent className="p-4">
           {/* Header */}
           <div className="flex items-start justify-between">

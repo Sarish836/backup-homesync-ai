@@ -109,7 +109,7 @@ Use real store names.`,
   const currentStoreItem = items[0]?.price_estimates?.find(p => p.store === currentStoreName);
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-4">
+    <div className="card-premium bg-card rounded-2xl border border-border/50 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-4 h-4 text-primary" />

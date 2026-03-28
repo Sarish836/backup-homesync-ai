@@ -30,8 +30,9 @@ export default function FileUploadZone({ onFileUploaded, accept = "image/*,appli
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer ${
-        isDragging ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-border hover:border-primary/40 hover:bg-muted/30'
+        isDragging ? 'border-primary scale-[1.01] glow-sm' : 'border-border hover:border-primary/50 hover:bg-muted/30'
       } ${busy ? 'pointer-events-none opacity-70' : ''}`}
+      style={isDragging ? {background:'linear-gradient(135deg,hsl(var(--primary)/0.08),hsl(var(--accent)/0.05))'} : {}}
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}

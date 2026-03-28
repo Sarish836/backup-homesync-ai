@@ -106,7 +106,8 @@ Be very specific - name the hospital, name each problematic charge, cite CDM rat
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 flex items-center gap-3"
+          className="rounded-2xl p-4 flex items-center gap-3 border border-primary/20"
+          style={{background:'linear-gradient(135deg,hsl(var(--primary)/0.12),hsl(var(--accent)/0.06))',boxShadow:'0 0 24px hsl(var(--primary)/0.15)'}}
         >
           <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
             <TrendingDown className="w-5 h-5 text-primary" />
