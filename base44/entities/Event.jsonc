@@ -52,16 +52,97 @@
         "flyer",
         "invitation",
         "note",
-        "manual"
+        "manual",
+        "party"
       ],
       "description": "How the event was added"
     },
     "file_url": {
       "type": "string",
       "description": "Uploaded source image URL"
+    },
+    "is_party": {
+      "type": "boolean",
+      "description": "Whether this is a party/gathering event"
+    },
+    "num_adults": {
+      "type": "number",
+      "description": "Number of adult guests"
+    },
+    "num_kids": {
+      "type": "number",
+      "description": "Number of child guests"
+    },
+    "party_theme": {
+      "type": "string",
+      "description": "Party theme"
+    },
+    "food_preferences": {
+      "type": "string",
+      "description": "Type of food wanted"
+    },
+    "food_plan": {
+      "type": "array",
+      "description": "AI-generated food plan",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "grocery_stores": {
+      "type": "array",
+      "description": "Nearest grocery stores with estimated costs",
+      "items": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "distance_miles": {
+            "type": "string"
+          },
+          "estimated_total": {
+            "type": "string"
+          },
+          "maps_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "estimated_food_cost": {
+      "type": "string",
+      "description": "Total estimated food cost"
     }
   },
   "required": [
     "name"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
 }
