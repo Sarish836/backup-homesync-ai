@@ -11,6 +11,7 @@ import StaplesManager from '../components/fridge/StaplesManager';
 import MissingStaples from '../components/fridge/MissingStaples';
 import AddressSetup from '../components/shared/AddressSetup';
 import { useLocationAndProfile } from '../hooks/useLocationAndProfile';
+import FadedImage from '../components/shared/FadedImage';
 
 export default function FridgeVision() {
   const [processing, setProcessing] = useState(false);
@@ -230,6 +231,7 @@ Be practical and suggest everyday recipes a home cook can make.`,
                 </div>
                 {isExpanded && (
                   <div className="p-4 space-y-4">
+                    <FadedImage src={scan.file_url} alt="fridge scan" />
                     <IngredientsList ingredients={scan.ingredients} />
                     {scan.missing_staples?.length > 0 && <MissingStaples items={scan.missing_staples} />}
                     <ShoppingList scan={scan} profile={profile} />
