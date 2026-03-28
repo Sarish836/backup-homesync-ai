@@ -36,10 +36,12 @@ function ThemedLayout() {
   const tabs = isAdmin ? [...baseTabs, { path: '/admin', icon: Shield, label: 'Admin' }] : baseTabs;
 
   const handleOnboardingComplete = async (form) => {
+    const user = currentUser || await base44.auth.me();
     await base44.entities.UserProfile.create({
       username: form.name,
       home_address: form.home_address || '',
       skip_address: form.skip_address || false,
+      created_by: user.email,
     });
     queryClient.invalidateQueries({ queryKey: ['user-profile'] });
   };
