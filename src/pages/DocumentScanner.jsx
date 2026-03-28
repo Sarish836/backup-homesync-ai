@@ -58,6 +58,7 @@ Extract title, company name, total amount, all line items. Flag overcharges, dup
 
 If category is "banking", just provide document_type and company_name — the full audit runs separately.`,
       file_urls: [fileUrl],
+      add_context_from_internet: true,
       response_json_schema: {
         type: "object",
         properties: {
@@ -298,10 +299,10 @@ If category is "banking", just provide document_type and company_name — the fu
                       </div>
                     )}
 
-                    {overcharges.length > 0 && (
+                    {(overcharges.length > 0 || bill.negotiation_script || bill.line_items?.length > 0) && (
                       <button onClick={() => setExpandedId(isExpanded ? null : bill.id)}
                         className="mt-3 w-full flex items-center justify-between text-sm text-primary font-medium hover:underline">
-                        <span>{overcharges.length} potential overcharge{overcharges.length > 1 ? 's' : ''} found</span>
+                        <span>{overcharges.length > 0 ? `${overcharges.length} potential overcharge${overcharges.length > 1 ? 's' : ''} found` : 'View full audit & script'}</span>
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
                     )}

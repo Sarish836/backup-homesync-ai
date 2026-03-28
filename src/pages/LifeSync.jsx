@@ -42,6 +42,7 @@ ${homeAddress ? `TRAVEL TIME: The user lives at "${homeAddress}". Estimate drivi
 
 IMPORTANT: Never leave date, time, location, or checklist empty if the information can be inferred or estimated from context.`,
       file_urls: [fileUrl],
+      add_context_from_internet: !!homeAddress,
       response_json_schema: {
         type: "object",
         properties: {
