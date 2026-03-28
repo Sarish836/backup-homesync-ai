@@ -11,8 +11,8 @@ const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmo
 const baseTabs = [
   { path: '/', icon: ScanText, label: 'Docs' },
   { path: '/event-planner', icon: CalendarDays, label: 'Events' },
-  { path: '/fridge', icon: Refrigerator, label: 'Pantry' },
   { path: '/home', icon: Home, label: 'Home', isHome: true },
+  { path: '/fridge', icon: Refrigerator, label: 'Pantry' },
   { path: '/fix-it', icon: Wrench, label: 'Repair' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];
@@ -31,7 +31,7 @@ function ThemedLayout() {
   });
   useTheme(profile?.theme || 'purple', profile?.dark_mode || false);
 
-  const needsOnboarding = !profileLoading && !profile?.username && !profile?.home_address && !profile?.skip_address;
+  const needsOnboarding = !profileLoading && profile === null;
   const isAdmin = currentUser && ADMIN_EMAILS.includes(currentUser.email);
   const tabs = isAdmin ? [...baseTabs, { path: '/admin', icon: Shield, label: 'Admin' }] : baseTabs;
 
