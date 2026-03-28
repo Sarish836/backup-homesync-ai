@@ -112,8 +112,8 @@ export default function Profile() {
 
       {/* Dark Mode Toggle */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="card-premium bg-card rounded-2xl border border-border/50 p-4">
-        <div className="flex items-center justify-between">
+        className="card-premium bg-card rounded-2xl border border-border/50 p-4 overflow-hidden">
+        <div className="flex items-center justify-between gap-3 min-w-0">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{background:'linear-gradient(135deg,hsl(var(--primary)/0.15),hsl(var(--accent)/0.1))'}}>
               {profile?.dark_mode ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-primary" />}
@@ -288,7 +288,7 @@ export default function Profile() {
 function Section({ icon: Icon, title, children }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="card-premium bg-card rounded-2xl border border-border/50 p-4">
+      className="card-premium bg-card rounded-2xl border border-border/50 p-4 overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
           <Icon className="w-3.5 h-3.5 text-primary" />
@@ -302,10 +302,10 @@ function Section({ icon: Icon, title, children }) {
 
 function Toggle({ label, description, value, onChange }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground">{label}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+    <div className="flex items-center justify-between gap-3 min-w-0">
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <p className="text-sm font-medium text-foreground truncate">{label}</p>
+        <p className="text-xs text-muted-foreground truncate">{description}</p>
       </div>
       <button
         type="button"
