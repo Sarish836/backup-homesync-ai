@@ -17,6 +17,7 @@ export default function LifeSync() {
   const [selectedDate, setSelectedDate] = useState(null);
   const queryClient = useQueryClient();
   const { profile, saveProfile } = useLocationAndProfile();
+  const homeAddress = [profile?.home_address, profile?.city, profile?.state, profile?.country].filter(Boolean).join(', ');
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
@@ -82,7 +83,7 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-heading font-bold text-xl text-foreground">Life Sync</h2>
+        <h2 className="font-heading font-bold text-xl text-foreground">Event Planner</h2>
         <p className="text-sm text-muted-foreground mt-0.5">Capture events from flyers & plan gatherings</p>
       </div>
 
@@ -129,8 +130,8 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
         <div className="space-y-3">
           {filteredEvents.map(event =>
             event.is_party
-              ? <PartyEventCard key={event.id} event={event} />
-              : <EventCard key={event.id} event={event} />
+              ? <PartyEventCard key={event.id} event={event} homeAddress={homeAddress} />
+              : <EventCard key={event.id} event={event} homeAddress={homeAddress} />
           )}
         </div>
       )}

@@ -11,6 +11,7 @@ import LifeSync from './pages/LifeSync';
 import FridgeVision from './pages/FridgeVision';
 import HomeFixIt from './pages/HomeFixIt';
 import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -41,9 +42,11 @@ const AuthenticatedApp = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<BillAuditor />} />
         <Route path="/life-sync" element={<LifeSync />} />
+        <Route path="/event-planner" element={<LifeSync />} />
         <Route path="/fridge" element={<FridgeVision />} />
         <Route path="/fix-it" element={<HomeFixIt />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

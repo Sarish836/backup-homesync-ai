@@ -1,13 +1,31 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PartyPopper, Users, ShoppingCart, ChevronDown, ChevronUp, ExternalLink, DollarSign, MapPin } from 'lucide-react';
+import { PartyPopper, Users, ShoppingCart, ChevronDown, ChevronUp, ExternalLink, DollarSign, MapPin, Trash2, Utensils } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 
-export default function PartyEventCard({ event }) {
+export default function PartyEventCard({ event, homeAddress }) {
   const [expanded, setExpanded] = useState(false);
+  const queryClient = useQueryClient();
   const totalGuests = (event.num_adults || 0) + (event.num_kids || 0);
+
+  const handleDelete = async () => {
+    if (!confirm('Delete this event?')) return;
+    await base44.entities.Event.delete(event.id);
+    queryClient.invalidateQueries({ queryKey: ['events'] });
+  };
+
+  const getMapsUrl = (storeAddress, storeName) => {
+    const dest = storeAddress || storeName;
+    const origin = homeAddress || '';
+    if (origin) {
+      return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}`;
+    }
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest)}`;
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
@@ -26,19 +44,21 @@ export default function PartyEventCard({ event }) {
                 </p>
               </div>
             </div>
-            <Badge variant="secondary" className="text-[10px] shrink-0 ml-2">Party</Badge>
+            <div className="flex items-center gap-1 ml-2 shrink-0">
+              <Badge variant="secondary" className="text-[10px]">Party</Badge>
+              <button onClick={handleDelete} className="h-7 w-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors">
+                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+              </button>
+            </div>
           </div>
 
-          {/* Stats row */}
           <div className="flex gap-3 flex-wrap mb-3">
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Users className="w-3.5 h-3.5" />
               <span>{event.num_adults || 0} adults, {event.num_kids || 0} kids</span>
             </div>
             {event.party_theme && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <span>🎨 {event.party_theme}</span>
-              </div>
+              <span className="text-xs text-muted-foreground">🎨 {event.party_theme}</span>
             )}
             {event.estimated_food_cost && (
               <div className="flex items-center gap-1 text-xs text-primary font-medium">
@@ -48,7 +68,6 @@ export default function PartyEventCard({ event }) {
             )}
           </div>
 
-          {/* Expand toggle */}
           {(event.food_plan?.length > 0 || event.grocery_stores?.length > 0) && (
             <button
               onClick={() => setExpanded(e => !e)}
@@ -67,7 +86,6 @@ export default function PartyEventCard({ event }) {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
-                {/* Food Plan */}
                 {event.food_plan?.length > 0 && (
                   <div className="mt-3">
                     <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1">
@@ -75,8 +93,16 @@ export default function PartyEventCard({ event }) {
                     </p>
                     <div className="space-y-1.5">
                       {event.food_plan.map((item, i) => (
-                        <div key={i} className="flex justify-between items-start text-xs bg-muted/40 rounded-lg px-3 py-2">
-                          <span className="font-medium text-foreground">{item.item}</span>
+                        <div key={i} className={`flex justify-between items-start text-xs rounded-lg px-3 py-2 ${
+                          item.source === 'restaurant' ? 'bg-accent/10 border border-accent/20' : 'bg-muted/40'
+                        }`}>
+                          <div className="flex items-center gap-1.5">
+                            {item.source === 'restaurant' && <Utensils className="w-3 h-3 text-accent-foreground shrink-0" />}
+                            <span className="font-medium text-foreground">{item.item}</span>
+                            {item.source === 'restaurant' && (
+                              <span className="text-[10px] bg-accent/20 text-accent-foreground px-1.5 py-0.5 rounded-full">Restaurant</span>
+                            )}
+                          </div>
                           <div className="text-right ml-2 shrink-0">
                             <span className="text-primary font-semibold">{item.quantity}</span>
                             {item.notes && <p className="text-muted-foreground text-[10px]">{item.notes}</p>}
@@ -87,11 +113,10 @@ export default function PartyEventCard({ event }) {
                   </div>
                 )}
 
-                {/* Grocery Stores */}
                 {event.grocery_stores?.length > 0 && (
                   <div className="mt-3">
                     <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" /> Nearest Stores & Estimated Costs
+                      <MapPin className="w-3.5 h-3.5" /> Nearest Stores & Costs
                     </p>
                     <div className="space-y-2">
                       {event.grocery_stores.map((store, i) => (
@@ -99,22 +124,19 @@ export default function PartyEventCard({ event }) {
                           <div>
                             <p className="font-semibold text-sm text-foreground">{store.store}</p>
                             <p className="text-[11px] text-muted-foreground">{store.address}</p>
-                            {store.distance_miles && (
-                              <p className="text-[11px] text-muted-foreground">{store.distance_miles} miles away</p>
-                            )}
+                            {store.distance_miles && <p className="text-[11px] text-muted-foreground">{store.distance_miles} miles away</p>}
+                            {store.hours && <p className="text-[11px] text-muted-foreground">🕐 {store.hours}</p>}
                           </div>
                           <div className="text-right ml-3 shrink-0">
                             <p className="font-bold text-primary text-sm">{store.estimated_total}</p>
-                            {store.maps_url && (
-                              <a
-                                href={store.maps_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[11px] text-primary flex items-center gap-0.5 justify-end mt-0.5 hover:underline"
-                              >
-                                Directions <ExternalLink className="w-3 h-3" />
-                              </a>
-                            )}
+                            <a
+                              href={getMapsUrl(store.address, store.store)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[11px] text-primary flex items-center gap-0.5 justify-end mt-0.5 hover:underline"
+                            >
+                              Directions <ExternalLink className="w-3 h-3" />
+                            </a>
                           </div>
                         </div>
                       ))}

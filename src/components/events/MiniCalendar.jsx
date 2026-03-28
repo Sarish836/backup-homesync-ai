@@ -1,12 +1,16 @@
-import React from 'react';
-import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addDays, startOfWeek } from 'date-fns';
+import React, { useState } from 'react';
+import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addDays, startOfWeek, addMonths, subMonths } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function MiniCalendar({ events = [], selectedDate, onSelectDate }) {
-  const today = new Date();
-  const monthStart = startOfMonth(today);
-  const monthEnd = endOfMonth(today);
+  const [viewDate, setViewDate] = useState(new Date());
+
+  const monthStart = startOfMonth(viewDate);
+  const monthEnd = endOfMonth(viewDate);
   const calendarStart = startOfWeek(monthStart);
   const days = eachDayOfInterval({ start: calendarStart, end: addDays(monthEnd, 6 - getDay(monthEnd)) });
+
+  const today = new Date();
 
   const eventDates = events
     .filter(e => e.date)
@@ -16,14 +20,28 @@ export default function MiniCalendar({ events = [], selectedDate, onSelectDate }
 
   return (
     <div className="bg-card rounded-2xl border border-border/50 p-4">
-      <h3 className="font-heading font-semibold text-sm mb-3">{format(today, 'MMMM yyyy')}</h3>
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={() => setViewDate(d => subMonths(d, 1))}
+          className="h-7 w-7 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <h3 className="font-heading font-semibold text-sm">{format(viewDate, 'MMMM yyyy')}</h3>
+        <button
+          onClick={() => setViewDate(d => addMonths(d, 1))}
+          className="h-7 w-7 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+        >
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+      </div>
       <div className="grid grid-cols-7 gap-1 text-center">
         {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
           <div key={i} className="text-[10px] font-medium text-muted-foreground py-1">{d}</div>
         ))}
         {days.map((day, i) => {
           const isToday = isSameDay(day, today);
-          const isCurrentMonth = day.getMonth() === today.getMonth();
+          const isCurrentMonth = day.getMonth() === viewDate.getMonth();
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const dayHasEvent = hasEvent(day);
 

@@ -172,7 +172,7 @@ Be practical and suggest everyday recipes a home cook can make.`,
             <MissingStaples items={latestScan.missing_staples} />
           )}
 
-          <ShoppingList scan={latestScan} />
+          <ShoppingList scan={latestScan} profile={profile} />
 
           {latestScan.recipes?.length > 0 && (
             <div className="space-y-3">

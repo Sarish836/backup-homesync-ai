@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Palette, Settings, Bell, Layout, Check, LogOut, ChevronRight } from 'lucide-react';
+import { User, Palette, Settings, Bell, Check, LogOut, MapPin, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { THEMES } from '../hooks/useTheme';
@@ -73,9 +73,10 @@ export default function Profile() {
     : user?.email?.[0]?.toUpperCase() || '?';
 
   const avatarColor = profile?.avatar_color || '#2d9b6f';
+  const fontSize = { small: '13px', medium: '15px', large: '17px' }[profile?.font_size] || '15px';
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8" style={{ fontSize }}>
       {/* Header */}
       <div>
         <h2 className="font-heading font-bold text-xl text-foreground">Profile & Settings</h2>
@@ -103,26 +104,52 @@ export default function Profile() {
         </Button>
       </motion.div>
 
-      {/* Username */}
-      <Section icon={User} title="Username">
-        <p className="text-xs text-muted-foreground mb-3">Choose a unique username for your account.</p>
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">@</span>
+      {/* Contact Info */}
+      <Section icon={MapPin} title="Personal Information">
+        <p className="text-xs text-muted-foreground mb-3">Used across all apps for nearby stores, directions, and events.</p>
+        <div className="space-y-2">
+          <input
+            type="text"
+            defaultValue={profile?.home_address || ''}
+            onBlur={(e) => e.target.value !== profile?.home_address && handleSave({ home_address: e.target.value })}
+            placeholder="Street address"
+            className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          <div className="grid grid-cols-2 gap-2">
             <input
               type="text"
-              value={usernameInput}
-              onChange={(e) => { setUsernameInput(e.target.value); setUsernameError(''); }}
-              placeholder="yourhandle"
-              className="w-full pl-7 pr-3 py-2 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-              onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
+              defaultValue={profile?.city || ''}
+              onBlur={(e) => e.target.value !== profile?.city && handleSave({ city: e.target.value })}
+              placeholder="City"
+              className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <input
+              type="text"
+              defaultValue={profile?.state || ''}
+              onBlur={(e) => e.target.value !== profile?.state && handleSave({ state: e.target.value })}
+              placeholder="State"
+              className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
-          <Button size="sm" onClick={handleUsernameSubmit}>
-            {usernameSaved ? <Check className="w-4 h-4" /> : 'Save'}
-          </Button>
+          <input
+            type="text"
+            defaultValue={profile?.country || ''}
+            onBlur={(e) => e.target.value !== profile?.country && handleSave({ country: e.target.value })}
+            placeholder="Country"
+            className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="tel"
+              defaultValue={profile?.phone || ''}
+              onBlur={(e) => e.target.value !== profile?.phone && handleSave({ phone: e.target.value })}
+              placeholder="Phone number"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
         </div>
-        {usernameError && <p className="text-xs text-destructive mt-1.5">{usernameError}</p>}
+        <p className="text-[11px] text-muted-foreground mt-2">Fields auto-save when you click away.</p>
       </Section>
 
       {/* Avatar Color */}

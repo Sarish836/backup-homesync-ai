@@ -2,13 +2,33 @@
   "name": "UserProfile",
   "type": "object",
   "properties": {
-    "home_address": {
-      "type": "string",
-      "description": "User's home address"
-    },
     "username": {
       "type": "string",
       "description": "Unique display username"
+    },
+    "phone": {
+      "type": "string",
+      "description": "User phone number"
+    },
+    "home_address": {
+      "type": "string",
+      "description": "Street address"
+    },
+    "city": {
+      "type": "string",
+      "description": "City"
+    },
+    "state": {
+      "type": "string",
+      "description": "State/Province"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country"
+    },
+    "skip_address": {
+      "type": "boolean",
+      "description": "User opted out of address-based features"
     },
     "avatar_color": {
       "type": "string",

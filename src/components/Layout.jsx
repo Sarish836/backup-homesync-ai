@@ -1,14 +1,16 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Receipt, CalendarDays, Refrigerator, Wrench, UserCircle } from 'lucide-react';
+import { Receipt, CalendarDays, Refrigerator, Wrench, UserCircle, Shield } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '../hooks/useTheme';
 import OnboardingModal from './shared/OnboardingModal';
 
-const tabs = [
+const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmohanty.live@gmail.com', 'samarthravi30@gmail.com'];
+
+const baseTabs = [
   { path: '/', icon: Receipt, label: 'Bills' },
-  { path: '/life-sync', icon: CalendarDays, label: 'Life Sync' },
+  { path: '/event-planner', icon: CalendarDays, label: 'Events' },
   { path: '/fridge', icon: Refrigerator, label: 'Fridge' },
   { path: '/fix-it', icon: Wrench, label: 'Fix-It' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
@@ -16,6 +18,9 @@ const tabs = [
 
 function ThemedLayout() {
   const queryClient = useQueryClient();
+  const [currentUser, setCurrentUser] = React.useState(null);
+  React.useEffect(() => { base44.auth.me().then(setCurrentUser).catch(() => {}); }, []);
+
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
@@ -25,12 +30,15 @@ function ThemedLayout() {
   });
   useTheme(profile?.theme || 'default');
 
-  const needsOnboarding = !profileLoading && !profile?.username && !profile?.home_address;
+  const needsOnboarding = !profileLoading && !profile?.username && !profile?.home_address && !profile?.skip_address;
+  const isAdmin = currentUser && ADMIN_EMAILS.includes(currentUser.email);
+  const tabs = isAdmin ? [...baseTabs, { path: '/admin', icon: Shield, label: 'Admin' }] : baseTabs;
 
   const handleOnboardingComplete = async (form) => {
     await base44.entities.UserProfile.create({
       username: form.name,
-      home_address: form.home_address,
+      home_address: form.home_address || '',
+      skip_address: form.skip_address || false,
     });
     queryClient.invalidateQueries({ queryKey: ['user-profile'] });
   };

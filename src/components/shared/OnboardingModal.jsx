@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 export default function OnboardingModal({ onComplete }) {
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ name: '', email: '', home_address: '' });
+  const [form, setForm] = useState({ name: '', home_address: '', skip_address: false });
 
   const steps = [
     {
@@ -25,10 +25,11 @@ export default function OnboardingModal({ onComplete }) {
     {
       icon: Home,
       title: 'What\'s your home address?',
-      subtitle: 'Used to calculate travel times and find nearby stores.',
+      subtitle: 'Used to calculate travel times and find nearby stores. You can skip this, but location-based features won\'t work.',
       field: 'home_address',
       placeholder: '123 Main St, City, State',
       type: 'text',
+      optional: true,
     },
   ];
 
@@ -43,7 +44,7 @@ export default function OnboardingModal({ onComplete }) {
     }
   };
 
-  const canProceed = !current.field || form[current.field]?.trim().length > 0;
+  const canProceed = !current.field || form.skip_address || form[current.field]?.trim().length > 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm px-4">
@@ -85,15 +86,28 @@ export default function OnboardingModal({ onComplete }) {
 
           {/* Input */}
           {current.field && (
-            <input
-              type={current.type}
-              placeholder={current.placeholder}
-              value={form[current.field]}
-              onChange={e => setForm(f => ({ ...f, [current.field]: e.target.value }))}
-              onKeyDown={e => e.key === 'Enter' && canProceed && handleNext()}
-              autoFocus
-              className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm mb-6"
-            />
+            <>
+              <input
+                type={current.type}
+                placeholder={current.placeholder}
+                value={form[current.field]}
+                onChange={e => setForm(f => ({ ...f, [current.field]: e.target.value, skip_address: false }))}
+                onKeyDown={e => e.key === 'Enter' && canProceed && handleNext()}
+                autoFocus
+                className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm mb-3"
+              />
+              {current.optional && (
+                <label className="flex items-center gap-2 text-xs text-muted-foreground mb-6 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.skip_address}
+                    onChange={e => setForm(f => ({ ...f, skip_address: e.target.checked, home_address: e.target.checked ? '' : f.home_address }))}
+                    className="rounded"
+                  />
+                  Skip — I don't want to use my address (location features won't work)
+                </label>
+              )}
+            </>
           )}
 
           <Button
