@@ -6,13 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
-import BillAuditor from './pages/BillAuditor';
-import LifeSync from './pages/LifeSync';
-import FridgeVision from './pages/FridgeVision';
-import HomeFixIt from './pages/HomeFixIt';
-import Profile from './pages/Profile';
-import Admin from './pages/Admin';
-import BankingAudit from './pages/BankingAudit';
+import DocumentScanner from './pages/DocumentScanner';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -41,14 +35,7 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<BillAuditor />} />
-        <Route path="/life-sync" element={<LifeSync />} />
-        <Route path="/event-planner" element={<LifeSync />} />
-        <Route path="/fridge" element={<FridgeVision />} />
-        <Route path="/fix-it" element={<HomeFixIt />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/banking" element={<BankingAudit />} />
+        <Route path="/" element={<DocumentScanner />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
