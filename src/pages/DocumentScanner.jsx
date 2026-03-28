@@ -83,53 +83,82 @@ Also extract the company/institution name from the document.`,
     } else {
       // Bill flow
       const analysis = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert financial bill auditor and consumer advocate AI. Your job is to find EVERY possible payment mistake, overcharge, or opportunity to save money on this bill. Be thorough and aggressive in identifying issues.
+        prompt: `You are an expert financial bill auditor and consumer advocate AI trained in patient bill statement analysis. Your job is to find EVERY possible payment mistake, overcharge, or opportunity to save money on this bill.
 
 ANALYZE EVERY LINE ITEM and flag ALL of the following:
 
-PAYMENT MISTAKES TO FIND:
+GENERAL PAYMENT MISTAKES:
 1. Duplicate charges - same service billed twice or more
-2. Incorrect amounts - charges that don't match advertised or contracted rates
-3. Charges for services not received or not rendered
+2. Incorrect amounts - charges not matching contracted or advertised rates
+3. Charges for services not received
 4. Wrong billing codes or misclassified services
-5. Math errors - line items that don't add up to the total
-6. Incorrect tax calculations or tax charged on tax-exempt items
+5. Math errors - line items that do not add up to the total
+6. Incorrect tax calculations
 7. Late fees applied incorrectly or waivable
-8. Early termination fees that may not apply
-9. Service fees added without disclosure
-10. Promotional rates not applied correctly
-11. Credits or discounts not applied
+8. Service fees added without prior disclosure
+9. Promotional rates not applied correctly
+10. Credits or discounts not applied
+
+FOR MEDICAL / PATIENT BILLS - DEEP ANALYSIS:
+A. ITEMIZED BILL AUDIT
+ - Review every line item charge individually
+ - Compare each CPT/HCPCS code to the standard national average reimbursement rate
+ - Flag any charge exceeding the Medicare rate by more than 200%
+ - Identify revenue codes (e.g., 0250 Pharmacy, 0360 OR, 0450 ER) and verify they match services listed
+ - Flag chargemaster (CDM) rates vs actual allowed amounts
+
+B. INSURANCE EOB CROSS-REFERENCE
+ - Compare what the insurer allowed vs what was billed
+ - Identify if the provider billed more than the contracted network rate
+ - Flag insurance underpayment
+ - Detect balance billing (illegal for in-network providers in most states)
+ - Check deductible applied correctly per plan year
+ - Verify co-pay and co-insurance calculated on the ALLOWED amount, not the billed amount
+
+C. CPT/PROCEDURE CODE ANALYSIS
+ - Upcoding: billed for a more complex procedure than performed
+ - Unbundling: billing separately for services CMS requires bundled
+ - Modifier abuse: using modifiers (25, 59) without clinical justification
+ - Mutually exclusive codes billed together
+ - Facility vs professional fee duplication
+
+D. PATIENT RESPONSIBILITY CALCULATION
+ - Verify patient responsibility = Allowed Amount minus Insurance Payment minus Contractual Adjustment
+ - Check if out-of-pocket maximum has been reached (patient owes $0 after)
+ - Verify coordination of benefits if patient has secondary insurance
+ - Check financial assistance / charity care eligibility
+ - Flag if no itemized bill was provided
+
+E. TIMING AND AUTHORIZATION ERRORS
+ - Pre-authorization not obtained
+ - Timely filing limit issues
+ - Retroactive denial of coverage
+ - Emergency services balance billing (illegal)
+
+F. HIDDEN CHARGES TO FLAG
+ - Facility fees for telehealth or basic office visits
+ - Observation status vs inpatient admission
+ - Supplies included in procedure fee billed separately
+ - Anesthesia time in excess of actual procedure time
+ - Pharmacy charges for medications the patient brought from home
 
 FOR UTILITY BILLS:
-- Compare rates against typical regional rates
-- Check for meter reading errors or estimated vs actual readings
-- Flag demand charges, peak charges, and delivery fees that can be negotiated
-- Identify tiered pricing errors
-
-FOR MEDICAL BILLS:
-- Cross-reference every CPT/procedure code against standard CDM rates
-- Check insurance EOB vs what was actually billed
-- Flag upcoding (billing for more complex service than provided)
-- Flag unbundling (billing separately for services that should be bundled)
-- Flag duplicate billing across dates
-- Check if insurance paid the contracted rate or underpaid
-- Flag charges for supplies that should be included in procedure cost
-- Identify balance billing violations if applicable
+ - Compare rates against typical regional rates
+ - Check for meter reading errors
+ - Flag demand charges and delivery fees
 
 FOR INTERNET/CABLE/PHONE BILLS:
-- Equipment rental charges vs buying outright
-- Promotional rate expirations not communicated
-- Fees disguised as taxes (regulatory recovery fees, etc.)
-- Autopay or paperless billing discounts not applied
+ - Equipment rental vs buying outright
+ - Promotional rate expirations
+ - Fees disguised as taxes
 
 FOR INSURANCE BILLS:
-- Premium increases without notice
-- Wrong coverage tier billed
-- Charges for lapsed coverage
+ - Premium increases without notice
+ - Wrong coverage tier billed
 
-For EVERY line item, determine if it is legitimate or an overcharge and provide the fair/correct price.
-Calculate total_amount (what was billed), potential_savings (total amount that could be saved/disputed).
-Provide a firm, specific negotiation script referencing the exact issues found.
+For EVERY line item state if it is legitimate or an overcharge and provide the fair price.
+Calculate total_amount (what was billed) and potential_savings (total that could be disputed).
+Provide a firm negotiation script referencing exact issues, dollar amounts, code numbers, and legal rights.
 Include the billing/customer service phone number from the document.`,
         file_urls: [fileUrl],
         response_json_schema: {
