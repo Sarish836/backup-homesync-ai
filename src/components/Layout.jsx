@@ -93,7 +93,7 @@ function ThemedLayout() {
               <Link
                 key={path}
                 to={path}
-                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all ${isActive ? 'text-primary' : 'text-blue-200 hover:text-white'}`}
+                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all ${isActive ? 'text-primary' : 'text-gray-400 hover:text-white'}`}
               >
                 <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'nav-active-glow' : ''}`}>
                   <Icon className="w-5 h-5" strokeWidth={isActive ? 2.2 : 1.8} />
