@@ -82,20 +82,54 @@ Also extract the company/institution name from the document.`,
     } else {
       // Bill flow
       const analysis = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a medical and household bill auditor AI. Analyze this bill document thoroughly.
+        prompt: `You are an expert financial bill auditor and consumer advocate AI. Your job is to find EVERY possible payment mistake, overcharge, or opportunity to save money on this bill. Be thorough and aggressive in identifying issues.
 
-1. IDENTIFY: Company/hospital name, bill category (utility, medical, internet, insurance, other), all line items with charge codes if present.
+ANALYZE EVERY LINE ITEM and flag ALL of the following:
 
-2. FOR MEDICAL BILLS specifically:
-   - Cross-reference each charge against typical hospital CDM (Chargemaster) rates for that procedure/service.
-   - Check if insurance paid the correct contracted rate.
-   - Flag any upcoding, duplicate billing, unbundling, or charges for services not rendered.
+PAYMENT MISTAKES TO FIND:
+1. Duplicate charges - same service billed twice or more
+2. Incorrect amounts - charges that don't match advertised or contracted rates
+3. Charges for services not received or not rendered
+4. Wrong billing codes or misclassified services
+5. Math errors - line items that don't add up to the total
+6. Incorrect tax calculations or tax charged on tax-exempt items
+7. Late fees applied incorrectly or waivable
+8. Early termination fees that may not apply
+9. Service fees added without disclosure
+10. Promotional rates not applied correctly
+11. Credits or discounts not applied
 
-3. FOR ALL BILLS:
-   - Compare each charge against fair market rates.
-   - Flag junk fees, excessive admin charges, and overcharges.
-   - Provide a negotiation script.
-   - Include the customer service/billing phone number.`,
+FOR UTILITY BILLS:
+- Compare rates against typical regional rates
+- Check for meter reading errors or estimated vs actual readings
+- Flag demand charges, peak charges, and delivery fees that can be negotiated
+- Identify tiered pricing errors
+
+FOR MEDICAL BILLS:
+- Cross-reference every CPT/procedure code against standard CDM rates
+- Check insurance EOB vs what was actually billed
+- Flag upcoding (billing for more complex service than provided)
+- Flag unbundling (billing separately for services that should be bundled)
+- Flag duplicate billing across dates
+- Check if insurance paid the contracted rate or underpaid
+- Flag charges for supplies that should be included in procedure cost
+- Identify balance billing violations if applicable
+
+FOR INTERNET/CABLE/PHONE BILLS:
+- Equipment rental charges vs buying outright
+- Promotional rate expirations not communicated
+- Fees disguised as taxes (regulatory recovery fees, etc.)
+- Autopay or paperless billing discounts not applied
+
+FOR INSURANCE BILLS:
+- Premium increases without notice
+- Wrong coverage tier billed
+- Charges for lapsed coverage
+
+For EVERY line item, determine if it is legitimate or an overcharge and provide the fair/correct price.
+Calculate total_amount (what was billed), potential_savings (total amount that could be saved/disputed).
+Provide a firm, specific negotiation script referencing the exact issues found.
+Include the billing/customer service phone number from the document.`,
         file_urls: [fileUrl],
         response_json_schema: {
           type: "object",
@@ -240,11 +274,16 @@ Also extract the company/institution name from the document.`,
                 <div className={`card-premium rounded-2xl border bg-card overflow-hidden ${doc.status === 'flagged' ? 'border-destructive/30' : ''}`}>
                   <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))' }} />
                   <div className="p-4 cursor-pointer" onClick={() => hasReport && setExpandedId(isExpanded ? null : doc.id)}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="h-9 w-9 rounded-xl shrink-0 flex items-center justify-center bg-primary/10">
-                          <Landmark className="w-4 h-4 text-primary" />
-                        </div>
+                   {doc.file_url && (
+                     <div className="mb-3 rounded-xl overflow-hidden border border-border/40 bg-muted" style={{maxHeight:'120px'}}>
+                       <img src={doc.file_url} alt="document" className="w-full h-full object-cover object-top" style={{maxHeight:'120px'}} onError={e => e.target.style.display='none'} />
+                     </div>
+                   )}
+                   <div className="flex items-center justify-between gap-3">
+                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                       <div className="h-9 w-9 rounded-xl shrink-0 flex items-center justify-center bg-primary/10">
+                         <Landmark className="w-4 h-4 text-primary" />
+                       </div>
                         <div className="min-w-0">
                           <p className="font-heading font-bold text-sm text-foreground truncate">{doc.document_type}</p>
                           <p className="text-[11px] text-muted-foreground">{new Date(doc.created_date).toLocaleDateString()}</p>
@@ -295,12 +334,17 @@ Also extract the company/institution name from the document.`,
                 <div className="card-premium rounded-2xl border bg-card overflow-hidden">
                   <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, hsl(var(--accent)), hsl(var(--primary)))' }} />
                   <div className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="h-9 w-9 rounded-xl shrink-0 flex items-center justify-center bg-accent/10">
-                          <Receipt className="w-4 h-4 text-accent" />
-                        </div>
-                        <div className="min-w-0">
+                   {bill.file_url && (
+                     <div className="mb-3 rounded-xl overflow-hidden border border-border/40 bg-muted" style={{maxHeight:'120px'}}>
+                       <img src={bill.file_url} alt="bill" className="w-full h-full object-cover object-top" style={{maxHeight:'120px'}} onError={e => e.target.style.display='none'} />
+                     </div>
+                   )}
+                   <div className="flex items-start justify-between">
+                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                       <div className="h-9 w-9 rounded-xl shrink-0 flex items-center justify-center bg-accent/10">
+                         <Receipt className="w-4 h-4 text-accent" />
+                       </div>
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-heading font-bold text-sm text-foreground truncate">{bill.title}</p>
                             <Badge variant="secondary" className="text-[10px]">{categoryLabels[bill.category] || bill.category}</Badge>
