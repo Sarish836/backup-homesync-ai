@@ -130,8 +130,8 @@ export default function Profile() {
             style={{ width: '44px', height: '24px', background: profile?.dark_mode ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))' }}
           >
             <span
-              className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
-              style={{ transform: profile?.dark_mode ? 'translateX(22px)' : 'translateX(2px)' }}
+              className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-md transition-all duration-300"
+              style={{ left: profile?.dark_mode ? 'calc(100% - 22px)' : '2px' }}
             />
           </button>
         </div>
@@ -314,8 +314,8 @@ function Toggle({ label, description, value, onChange }) {
         style={{ width: '44px', height: '24px', background: value ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}
       >
         <span
-          className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
-          style={{ transform: value ? 'translateX(22px)' : 'translateX(2px)' }}
+          className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-md transition-all duration-300"
+          style={{ left: value ? 'calc(100% - 22px)' : '2px' }}
         />
       </button>
     </div>
