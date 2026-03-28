@@ -9,63 +9,63 @@
     --font-heading: 'DM Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    /* Light mode base */
-    --background: 220 20% 97%;
-    --foreground: 220 25% 8%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 25% 8%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 8%;
-    --primary: 262 80% 58%;
+    /* Dark Blue & White theme */
+    --background: 218 40% 8%;
+    --foreground: 210 20% 96%;
+    --card: 218 35% 12%;
+    --card-foreground: 210 20% 96%;
+    --popover: 218 35% 12%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 210 100% 56%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 262 80% 58%;
-    --secondary: 220 15% 94%;
-    --secondary-foreground: 220 20% 15%;
-    --muted: 220 12% 92%;
-    --muted-foreground: 220 10% 50%;
-    --accent: 290 70% 60%;
+    --primary-glow: 210 100% 56%;
+    --secondary: 218 30% 18%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 218 28% 16%;
+    --muted-foreground: 215 15% 55%;
+    --accent: 199 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 262 80% 58%;
-    --chart-1: 262 80% 58%;
-    --chart-2: 35 92% 60%;
-    --chart-3: 220 70% 55%;
+    --border: 218 25% 20%;
+    --input: 218 25% 20%;
+    --ring: 210 100% 56%;
+    --chart-1: 210 100% 56%;
+    --chart-2: 199 100% 50%;
+    --chart-3: 220 70% 65%;
     --chart-4: 340 65% 55%;
-    --chart-5: 280 60% 55%;
+    --chart-5: 170 60% 50%;
     --radius: 1rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 262 80% 58%;
+    --sidebar-background: 218 40% 8%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-primary: 210 100% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 94%;
-    --sidebar-accent-foreground: 220 20% 15%;
-    --sidebar-border: 220 15% 88%;
-    --sidebar-ring: 262 80% 58%;
+    --sidebar-accent: 218 30% 18%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 218 25% 20%;
+    --sidebar-ring: 210 100% 56%;
   }
 
   .dark {
-    --background: 224 25% 6%;
-    --foreground: 220 15% 92%;
-    --card: 224 22% 10%;
-    --card-foreground: 220 15% 92%;
-    --popover: 224 22% 10%;
-    --popover-foreground: 220 15% 92%;
-    --secondary: 224 20% 14%;
-    --secondary-foreground: 220 15% 85%;
-    --muted: 224 18% 14%;
-    --muted-foreground: 220 10% 52%;
+    --background: 218 40% 8%;
+    --foreground: 210 20% 96%;
+    --card: 218 35% 12%;
+    --card-foreground: 210 20% 96%;
+    --popover: 218 35% 12%;
+    --popover-foreground: 210 20% 96%;
+    --secondary: 218 30% 18%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 218 28% 16%;
+    --muted-foreground: 215 15% 55%;
     --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 224 18% 16%;
-    --input: 224 18% 16%;
-    --sidebar-background: 224 25% 6%;
-    --sidebar-foreground: 220 15% 92%;
-    --sidebar-accent: 224 20% 14%;
-    --sidebar-accent-foreground: 220 15% 85%;
-    --sidebar-border: 224 18% 16%;
+    --border: 218 25% 20%;
+    --input: 218 25% 20%;
+    --sidebar-background: 218 40% 8%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-accent: 218 30% 18%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 218 25% 20%;
   }
 }
 
@@ -75,13 +75,11 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(ellipse at 20% 0%, hsl(var(--primary) / 0.06) 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 100%, hsl(var(--accent) / 0.05) 0%, transparent 50%);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0-6l22-12.7V22.7L28 10 6 22.7v24.6L28 60z' fill='%231e40af' fill-opacity='0.13'/%3E%3Cpath d='M28 100L0 84V50l28-16 28 16v34L28 100zm0-6l22-12.7V56.7L28 44 6 56.7v24.6L28 94z' fill='%231e40af' fill-opacity='0.07'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse at 20% 0%, hsl(var(--primary) / 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, hsl(var(--accent) / 0.1) 0%, transparent 60%);
     background-attachment: fixed;
-  }
-  .dark body {
-    background-image: radial-gradient(ellipse at 20% 0%, hsl(var(--primary) / 0.12) 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 100%, hsl(var(--accent) / 0.08) 0%, transparent 50%);
   }
 }
 

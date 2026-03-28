@@ -16,6 +16,7 @@ const baseTabs = [
   { path: '/fix-it', icon: Wrench, label: 'Repair' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];
+// Home is index 2 (middle of 6 tabs) — already centered
 
 function ThemedLayout() {
   const queryClient = useQueryClient();

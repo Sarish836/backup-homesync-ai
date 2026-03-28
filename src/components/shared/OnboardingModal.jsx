@@ -50,7 +50,8 @@ export default function OnboardingModal({ onComplete }) {
 
   const current = signupSteps[step];
   const isLast = step === signupSteps.length - 1;
-  const canProceed = !current?.field || form.skip_address || form[current.field]?.trim().length > 0;
+  // Name step requires input; address step is always optional
+  const canProceed = !current?.field || current.optional || form.skip_address || form[current.field]?.trim().length > 0;
 
   // Auth screen
   if (mode === 'auth') {
@@ -147,7 +148,7 @@ export default function OnboardingModal({ onComplete }) {
                 type={current.type}
                 placeholder={current.placeholder}
                 value={form[current.field]}
-                onChange={e => setForm(f => ({ ...f, [current.field]: e.target.value, skip_address: false }))}
+                onChange={e => setForm(f => ({ ...f, [current.field]: e.target.value }))}
                 onKeyDown={e => e.key === 'Enter' && canProceed && handleNext()}
                 autoFocus
                 className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm mb-3"
