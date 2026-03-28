@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, User, ArrowRight, Sparkles, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,9 +33,18 @@ const signupSteps = [
 ];
 
 export default function OnboardingModal({ onComplete }) {
+  // If user is already authenticated (e.g. returned from Google/Apple OAuth),
+  // skip the login screen and go straight to profile setup
   const [mode, setMode] = useState('auth'); // 'auth' | 'signup'
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ name: '', home_address: '', skip_address: false });
+
+  // On mount, check if user is already logged in — if so, skip to signup steps
+  useEffect(() => {
+    base44.auth.isAuthenticated().then(authed => {
+      if (authed) setMode('signup');
+    });
+  }, []);
 
   const handleLogin = () => base44.auth.redirectToLogin(window.location.href);
   const handleSignUp = () => { setMode('signup'); setStep(0); };

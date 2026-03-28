@@ -74,7 +74,7 @@ function ThemedLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/40">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" style={{ background: 'hsl(218 60% 14%)' }}>
         <div className="max-w-4xl mx-auto flex items-end">
           {tabs.map(({ path, icon: Icon, label, isHome }) => {
             const isActive = path === '/home' ? location.pathname === '/home' : (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
