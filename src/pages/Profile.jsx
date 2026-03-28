@@ -19,7 +19,7 @@ export default function Profile() {
   const [usernameInput, setUsernameInput] = useState('');
   const [usernameSaved, setUsernameSaved] = useState(false);
   const [usernameError, setUsernameError] = useState('');
-  const [addressForm, setAddressForm] = useState({ home_address: '', city: '', state: '', country: '', phone: '' });
+  const [addressForm, setAddressForm] = useState({ home_address: '', phone: '', email: '' });
   const [addressInitialized, setAddressInitialized] = useState(false);
 
   useEffect(() => {
@@ -74,10 +74,8 @@ export default function Profile() {
     if (profile && !addressInitialized) {
       setAddressForm({
         home_address: profile.home_address || '',
-        city: profile.city || '',
-        state: profile.state || '',
-        country: profile.country || '',
         phone: profile.phone || '',
+        email: user?.email || '',
       });
       setAddressInitialized(true);
     }
@@ -121,42 +119,18 @@ export default function Profile() {
 
       {/* Contact Info */}
       <Section icon={MapPin} title="Personal Information">
-        <p className="text-xs text-muted-foreground mb-3">Used across all apps for nearby stores, directions, and events.</p>
         <div className="space-y-2">
-          <input
-            type="text"
-            value={addressForm.home_address}
-            onChange={(e) => setAddressForm(f => ({ ...f, home_address: e.target.value }))}
-            onBlur={(e) => handleSave({ home_address: e.target.value })}
-            placeholder="Street address"
-            className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-          />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              value={addressForm.city}
-              onChange={(e) => setAddressForm(f => ({ ...f, city: e.target.value }))}
-              onBlur={(e) => handleSave({ city: e.target.value })}
-              placeholder="City"
-              className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <input
-              type="text"
-              value={addressForm.state}
-              onChange={(e) => setAddressForm(f => ({ ...f, state: e.target.value }))}
-              onBlur={(e) => handleSave({ state: e.target.value })}
-              placeholder="State"
-              className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              value={addressForm.home_address}
+              onChange={(e) => setAddressForm(f => ({ ...f, home_address: e.target.value }))}
+              onBlur={(e) => handleSave({ home_address: e.target.value })}
+              placeholder="Home address"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
-          <input
-            type="text"
-            value={addressForm.country}
-            onChange={(e) => setAddressForm(f => ({ ...f, country: e.target.value }))}
-            onBlur={(e) => handleSave({ country: e.target.value })}
-            placeholder="Country"
-            className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-          />
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
@@ -166,6 +140,16 @@ export default function Profile() {
               onBlur={(e) => handleSave({ phone: e.target.value })}
               placeholder="Phone number"
               className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="email"
+              value={addressForm.email}
+              readOnly
+              placeholder="Email"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-muted text-muted-foreground cursor-not-allowed"
             />
           </div>
         </div>
