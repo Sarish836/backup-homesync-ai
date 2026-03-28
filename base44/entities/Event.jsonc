@@ -1,0 +1,59 @@
+{
+  "name": "Event",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Event name"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Event date"
+    },
+    "time": {
+      "type": "string",
+      "description": "Event time"
+    },
+    "location": {
+      "type": "string",
+      "description": "Event location/address"
+    },
+    "description": {
+      "type": "string",
+      "description": "Event description"
+    },
+    "checklist": {
+      "type": "array",
+      "description": "Don't Forget checklist items",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "checked": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "flyer",
+        "invitation",
+        "note",
+        "manual"
+      ],
+      "description": "How the event was added"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Uploaded source image URL"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

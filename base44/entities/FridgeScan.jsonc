@@ -1,0 +1,96 @@
+{
+  "name": "FridgeScan",
+  "type": "object",
+  "properties": {
+    "scan_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of scan"
+    },
+    "ingredients": {
+      "type": "array",
+      "description": "Identified ingredients",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "expires_soon": {
+            "type": "boolean"
+          },
+          "estimated_expiry": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "recipes": {
+      "type": "array",
+      "description": "Suggested recipes",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "cook_time": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string"
+          },
+          "ingredients_needed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "missing_ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "shopping_list": {
+      "type": "array",
+      "description": "Missing items shopping list",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "for_recipe": {
+            "type": "string"
+          },
+          "bought": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Uploaded fridge photo URL"
+    }
+  },
+  "required": [
+    "scan_date"
+  ]
+}

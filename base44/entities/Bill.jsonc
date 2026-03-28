@@ -1,0 +1,78 @@
+{
+  "name": "Bill",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Bill title or company name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "utility",
+        "medical",
+        "internet",
+        "insurance",
+        "other"
+      ],
+      "description": "Type of bill"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total bill amount"
+    },
+    "potential_savings": {
+      "type": "number",
+      "description": "Estimated potential savings"
+    },
+    "line_items": {
+      "type": "array",
+      "description": "Extracted line items from the bill",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "is_overcharge": {
+            "type": "boolean"
+          },
+          "fair_price": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "company_phone": {
+      "type": "string",
+      "description": "Customer service phone number"
+    },
+    "negotiation_script": {
+      "type": "string",
+      "description": "AI-generated negotiation script"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Uploaded bill file URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "analyzing",
+        "reviewed",
+        "disputed",
+        "resolved"
+      ],
+      "default": "analyzing"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

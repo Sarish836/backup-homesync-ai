@@ -1,0 +1,88 @@
+{
+  "name": "RepairJob",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Name of the repair"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "moderate",
+        "hard",
+        "professional_required"
+      ],
+      "description": "Difficulty level"
+    },
+    "safety_warning": {
+      "type": "string",
+      "description": "Safety warnings if applicable"
+    },
+    "description": {
+      "type": "string",
+      "description": "AI diagnosis of the damage"
+    },
+    "parts_list": {
+      "type": "array",
+      "description": "Required parts",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "estimated_cost": {
+            "type": "string"
+          },
+          "search_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "description": "Step-by-step DIY instructions",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_number": {
+            "type": "number"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "tip": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "estimated_time": {
+      "type": "string",
+      "description": "Estimated repair time"
+    },
+    "estimated_cost": {
+      "type": "string",
+      "description": "Estimated total cost"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Uploaded damage photo URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "diagnosed",
+        "in_progress",
+        "completed"
+      ],
+      "default": "diagnosed"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

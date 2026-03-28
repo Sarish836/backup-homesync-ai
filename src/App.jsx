@@ -5,7 +5,11 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import Layout from './components/Layout';
+import BillAuditor from './pages/BillAuditor';
+import LifeSync from './pages/LifeSync';
+import FridgeVision from './pages/FridgeVision';
+import HomeFixIt from './pages/HomeFixIt';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +37,12 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<BillAuditor />} />
+        <Route path="/life-sync" element={<LifeSync />} />
+        <Route path="/fridge" element={<FridgeVision />} />
+        <Route path="/fix-it" element={<HomeFixIt />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
