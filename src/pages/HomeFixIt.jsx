@@ -15,12 +15,12 @@ export default function HomeFixIt() {
 
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ['repair-jobs'],
-    queryFn: () => base44.entities.RepairJob.list('-created_date', 50),
+    queryFn: () => base44.entities.RepairJob.list('-created_date', 50)
   });
 
   const createJob = useMutation({
     mutationFn: (data) => base44.entities.RepairJob.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['repair-jobs'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['repair-jobs'] })
   });
 
   const handleFileUploaded = async (fileUrl) => {
@@ -111,7 +111,7 @@ ${locationContext && `8. IF damage_rating is 7 or higher OR difficulty is profes
     await createJob.mutateAsync({
       ...analysis,
       file_url: fileUrl,
-      status: 'diagnosed',
+      status: 'diagnosed'
     });
     setProcessing(false);
   };
@@ -119,7 +119,7 @@ ${locationContext && `8. IF damage_rating is 7 or higher OR difficulty is profes
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-heading font-bold text-xl text-foreground">Home Fix-It</h2>
+        <h2 className="font-heading font-bold text-xl text-foreground">Fix Vision</h2>
         <p className="text-sm text-muted-foreground mt-0.5">Diagnose damage & find local repair help</p>
       </div>
 
@@ -129,26 +129,26 @@ ${locationContext && `8. IF damage_rating is 7 or higher OR difficulty is profes
         onFileUploaded={handleFileUploaded}
         label="Take a photo of the damage"
         isProcessing={processing}
-        accept="image/*"
-      />
+        accept="image/*" />
+      
 
-      {isLoading ? (
-        <div className="flex justify-center py-8">
+      {isLoading ?
+      <div className="flex justify-center py-8">
           <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+        </div> :
+      jobs.length === 0 ?
+      <EmptyState
+        icon={Wrench}
+        title="No repair jobs yet"
+        description="Upload a photo of something broken to get a diagnosis, cost breakdown & local pros" /> :
+
+
+      <div className="space-y-3">
+          {jobs.map((job) =>
+        <RepairCard key={job.id} job={job} />
+        )}
         </div>
-      ) : jobs.length === 0 ? (
-        <EmptyState
-          icon={Wrench}
-          title="No repair jobs yet"
-          description="Upload a photo of something broken to get a diagnosis, cost breakdown & local pros"
-        />
-      ) : (
-        <div className="space-y-3">
-          {jobs.map(job => (
-            <RepairCard key={job.id} job={job} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
