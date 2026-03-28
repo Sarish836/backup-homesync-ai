@@ -1,0 +1,183 @@
+{
+  "name": "BankingDocument",
+  "type": "object",
+  "properties": {
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "Bank Statement",
+        "Loan Estimate",
+        "Closing Disclosure",
+        "Tax Return",
+        "Pay Stub"
+      ],
+      "description": "Type of banking document"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Uploaded document URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "analyzing",
+        "complete",
+        "flagged"
+      ],
+      "default": "pending",
+      "description": "Audit status"
+    },
+    "fraud_risk_score": {
+      "type": "number",
+      "description": "Fraud risk score 0-100"
+    },
+    "fraud_risk_level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "description": "Fraud risk level"
+    },
+    "audit_results": {
+      "type": "object",
+      "description": "Full audit results JSON",
+      "properties": {
+        "duplicate_transactions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "description": {
+                "type": "string"
+              },
+              "occurrences": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "hidden_fees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "date": {
+                "type": "string"
+              },
+              "reason_flagged": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "fee_increases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fee_name": {
+                "type": "string"
+              },
+              "estimate_amount": {
+                "type": "number"
+              },
+              "closing_amount": {
+                "type": "number"
+              },
+              "percent_increase": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "loan_readiness": {
+          "type": "object",
+          "properties": {
+            "missing_signatures": {
+              "type": "boolean"
+            },
+            "dates_outdated": {
+              "type": "boolean"
+            },
+            "dti_ratio": {
+              "type": "number"
+            },
+            "monthly_income": {
+              "type": "number"
+            },
+            "monthly_debts": {
+              "type": "number"
+            },
+            "income_deposit_match": {
+              "type": "boolean"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "security_scan": {
+          "type": "object",
+          "properties": {
+            "pixel_inconsistencies": {
+              "type": "boolean"
+            },
+            "font_mismatches": {
+              "type": "boolean"
+            },
+            "logo_verified": {
+              "type": "boolean"
+            },
+            "fraud_indicators": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "summary": {
+          "type": "string"
+        },
+        "total_issues": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "document_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

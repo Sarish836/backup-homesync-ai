@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Receipt, CalendarDays, Refrigerator, Wrench, UserCircle, Shield } from 'lucide-react';
+import { Receipt, CalendarDays, Refrigerator, Wrench, UserCircle, Shield, Landmark } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '../hooks/useTheme';
@@ -10,9 +10,10 @@ const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmo
 
 const baseTabs = [
   { path: '/', icon: Receipt, label: 'Bills' },
+  { path: '/banking', icon: Landmark, label: 'Banking' },
   { path: '/event-planner', icon: CalendarDays, label: 'Events' },
-  { path: '/fridge', icon: Refrigerator, label: 'Pantry Pal' },
-  { path: '/fix-it', icon: Wrench, label: 'Damage' },
+  { path: '/fridge', icon: Refrigerator, label: 'Pantry' },
+  { path: '/fix-it', icon: Wrench, label: 'Repair' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];
 
