@@ -11,8 +11,8 @@ const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmo
 const baseTabs = [
   { path: '/', icon: ScanText, label: 'Docs' },
   { path: '/event-planner', icon: CalendarDays, label: 'Events' },
-  { path: '/home', icon: Home, label: 'Home', isHome: true },
   { path: '/fridge', icon: Refrigerator, label: 'Pantry' },
+  { path: '/home', icon: Home, label: 'Home', isHome: true },
   { path: '/fix-it', icon: Wrench, label: 'Repair' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];

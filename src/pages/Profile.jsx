@@ -300,18 +300,16 @@ function Section({ icon: Icon, title, children }) {
 function Toggle({ label, description, value, onChange }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <div>
+      <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground">{label}</p>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
-      <button
-        onClick={() => onChange(!value)}
-        className="relative rounded-full transition-all duration-300 shrink-0"
-        style={{width:'48px', height:'26px', background: value ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
-      >
-        <span className="absolute top-[3px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
-          style={{ transform: value ? 'translateX(24px)' : 'translateX(3px)' }} />
-      </button>
+      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+        <input type="checkbox" className="sr-only" checked={value} onChange={() => onChange(!value)} />
+        <div className={`w-11 h-6 rounded-full transition-colors duration-200 ${value ? 'bg-primary' : 'bg-muted'}`}>
+          <div className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${value ? 'translate-x-5' : 'translate-x-0'}`} />
+        </div>
+      </label>
     </div>
   );
 }
