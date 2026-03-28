@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign, Phone, Store } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign, Phone, Store, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 
 const difficultyConfig = {
   easy: { label: 'Easy DIY', color: 'bg-green-100 text-green-700' },
@@ -14,7 +16,14 @@ const difficultyConfig = {
 
 export default function RepairCard({ job }) {
   const [expanded, setExpanded] = useState(false);
+  const queryClient = useQueryClient();
   const config = difficultyConfig[job.difficulty] || difficultyConfig.moderate;
+
+  const handleDelete = async () => {
+    if (!confirm('Delete this repair job?')) return;
+    await base44.entities.RepairJob.delete(job.id);
+    queryClient.invalidateQueries({ queryKey: ['repair-jobs'] });
+  };
   const isPro = job.difficulty === 'professional_required';
 
   return (
@@ -38,6 +47,9 @@ export default function RepairCard({ job }) {
               <p className="text-xs text-muted-foreground mt-0.5">{job.description}</p>
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+              <button onClick={handleDelete} className="h-7 w-7 rounded-lg hover:bg-destructive/10 flex items-center justify-center mb-1">
+                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+              </button>
               <Badge className={`${config.color} border-0 text-[10px]`}>{config.label}</Badge>
               {job.damage_rating != null && (
                 <div className="flex items-center gap-1">

@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Phone, FileText, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { ChevronDown, ChevronUp, Phone, FileText, AlertTriangle, ShieldAlert, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 
 const categoryLabels = {
   utility: 'Utility',
@@ -22,7 +24,14 @@ const statusColors = {
 
 export default function BillCard({ bill }) {
   const [expanded, setExpanded] = useState(false);
+  const queryClient = useQueryClient();
   const overcharges = bill.line_items?.filter(i => i.is_overcharge) || [];
+
+  const handleDelete = async () => {
+    if (!confirm('Delete this bill?')) return;
+    await base44.entities.Bill.delete(bill.id);
+    queryClient.invalidateQueries({ queryKey: ['bills'] });
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
@@ -33,6 +42,9 @@ export default function BillCard({ bill }) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-heading font-semibold text-foreground truncate">{bill.title}</h3>
+                <button onClick={handleDelete} className="h-6 w-6 rounded-lg hover:bg-destructive/10 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-3 h-3 text-destructive" />
+                </button>
                 <Badge variant="secondary" className="text-[10px] shrink-0">
                   {categoryLabels[bill.category] || bill.category}
                 </Badge>

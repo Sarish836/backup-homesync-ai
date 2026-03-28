@@ -11,8 +11,8 @@ const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmo
 const baseTabs = [
   { path: '/', icon: Receipt, label: 'Bills' },
   { path: '/event-planner', icon: CalendarDays, label: 'Events' },
-  { path: '/fridge', icon: Refrigerator, label: 'Fridge' },
-  { path: '/fix-it', icon: Wrench, label: 'Fix-It' },
+  { path: '/fridge', icon: Refrigerator, label: 'Pantry Pal' },
+  { path: '/fix-it', icon: Wrench, label: 'Damage' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];
 
@@ -55,7 +55,7 @@ function ThemedLayout() {
             <span className="text-primary-foreground font-heading font-bold text-sm">HS</span>
           </div>
           <div>
-            <h1 className="font-heading font-bold text-lg leading-tight text-foreground">HomeSync AI</h1>
+            <h1 className="font-heading font-bold text-lg leading-tight text-foreground">MyHomeAI</h1>
             <p className="text-[11px] text-muted-foreground leading-tight">Your smart home assistant</p>
           </div>
         </div>

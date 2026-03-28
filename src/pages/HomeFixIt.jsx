@@ -119,7 +119,7 @@ ${locationContext && `8. IF damage_rating is 7 or higher OR difficulty is profes
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-heading font-bold text-xl text-foreground">Fix Vision</h2>
+        <h2 className="font-heading font-bold text-xl text-foreground">Damage Assessor</h2>
         <p className="text-sm text-muted-foreground mt-0.5">Diagnose damage & find local repair help</p>
       </div>
 

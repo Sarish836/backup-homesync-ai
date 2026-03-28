@@ -19,6 +19,8 @@ export default function Profile() {
   const [usernameInput, setUsernameInput] = useState('');
   const [usernameSaved, setUsernameSaved] = useState(false);
   const [usernameError, setUsernameError] = useState('');
+  const [addressForm, setAddressForm] = useState({ home_address: '', city: '', state: '', country: '', phone: '' });
+  const [addressInitialized, setAddressInitialized] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -68,6 +70,19 @@ export default function Profile() {
     if (profile?.username) setUsernameInput(profile.username);
   }, [profile?.username]);
 
+  useEffect(() => {
+    if (profile && !addressInitialized) {
+      setAddressForm({
+        home_address: profile.home_address || '',
+        city: profile.city || '',
+        state: profile.state || '',
+        country: profile.country || '',
+        phone: profile.phone || '',
+      });
+      setAddressInitialized(true);
+    }
+  }, [profile, addressInitialized]);
+
   const initials = user?.full_name
     ? user.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() || '?';
@@ -80,7 +95,7 @@ export default function Profile() {
       {/* Header */}
       <div>
         <h2 className="font-heading font-bold text-xl text-foreground">Profile & Settings</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Customize your HomeSync AI experience</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Customize your MyHomeAI experience</p>
       </div>
 
       {/* Avatar + Identity */}
@@ -110,31 +125,35 @@ export default function Profile() {
         <div className="space-y-2">
           <input
             type="text"
-            defaultValue={profile?.home_address || ''}
-            onBlur={(e) => e.target.value !== profile?.home_address && handleSave({ home_address: e.target.value })}
+            value={addressForm.home_address}
+            onChange={(e) => setAddressForm(f => ({ ...f, home_address: e.target.value }))}
+            onBlur={(e) => handleSave({ home_address: e.target.value })}
             placeholder="Street address"
             className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <div className="grid grid-cols-2 gap-2">
             <input
               type="text"
-              defaultValue={profile?.city || ''}
-              onBlur={(e) => e.target.value !== profile?.city && handleSave({ city: e.target.value })}
+              value={addressForm.city}
+              onChange={(e) => setAddressForm(f => ({ ...f, city: e.target.value }))}
+              onBlur={(e) => handleSave({ city: e.target.value })}
               placeholder="City"
               className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
             <input
               type="text"
-              defaultValue={profile?.state || ''}
-              onBlur={(e) => e.target.value !== profile?.state && handleSave({ state: e.target.value })}
+              value={addressForm.state}
+              onChange={(e) => setAddressForm(f => ({ ...f, state: e.target.value }))}
+              onBlur={(e) => handleSave({ state: e.target.value })}
               placeholder="State"
               className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
           <input
             type="text"
-            defaultValue={profile?.country || ''}
-            onBlur={(e) => e.target.value !== profile?.country && handleSave({ country: e.target.value })}
+            value={addressForm.country}
+            onChange={(e) => setAddressForm(f => ({ ...f, country: e.target.value }))}
+            onBlur={(e) => handleSave({ country: e.target.value })}
             placeholder="Country"
             className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
@@ -142,8 +161,9 @@ export default function Profile() {
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="tel"
-              defaultValue={profile?.phone || ''}
-              onBlur={(e) => e.target.value !== profile?.phone && handleSave({ phone: e.target.value })}
+              value={addressForm.phone}
+              onChange={(e) => setAddressForm(f => ({ ...f, phone: e.target.value }))}
+              onBlur={(e) => handleSave({ phone: e.target.value })}
               placeholder="Phone number"
               className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
