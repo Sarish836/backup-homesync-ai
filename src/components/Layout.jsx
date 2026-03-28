@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { ScanText, CalendarDays, Refrigerator, Wrench, UserCircle, Shield, Home } from 'lucide-react';
+import { ScanText, CalendarDays, Refrigerator, Wrench, UserCircle, Shield, Home, Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '../hooks/useTheme';
@@ -50,6 +50,35 @@ function ThemedLayout() {
   const location = useLocation();
   const fontSize = { small: '13px', medium: '15px', large: '17px' }[profile?.font_size] || '15px';
 
+  const clearHistory = async () => {
+    const path = location.pathname;
+    if (!confirm('Clear all history for this tab?')) return;
+    if (path === '/') {
+      const bills = await base44.entities.Bill.list();
+      const docs = await base44.entities.BankingDocument.list();
+      await Promise.all([
+        ...bills.map(b => base44.entities.Bill.delete(b.id)),
+        ...docs.map(d => base44.entities.BankingDocument.delete(d.id)),
+      ]);
+      queryClient.invalidateQueries({ queryKey: ['bills'] });
+      queryClient.invalidateQueries({ queryKey: ['banking-documents'] });
+    } else if (path === '/event-planner') {
+      const events = await base44.entities.Event.list();
+      await Promise.all(events.map(e => base44.entities.Event.delete(e.id)));
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    } else if (path === '/fridge') {
+      const scans = await base44.entities.FridgeScan.list();
+      await Promise.all(scans.map(s => base44.entities.FridgeScan.delete(s.id)));
+      queryClient.invalidateQueries({ queryKey: ['fridge-scans'] });
+    } else if (path === '/fix-it') {
+      const jobs = await base44.entities.RepairJob.list();
+      await Promise.all(jobs.map(j => base44.entities.RepairJob.delete(j.id)));
+      queryClient.invalidateQueries({ queryKey: ['repair-jobs'] });
+    }
+  };
+
+  const showClearButton = ['/', '/event-planner', '/fridge', '/fix-it'].includes(location.pathname);
+
   React.useEffect(() => {
     document.documentElement.style.fontSize = fontSize;
     return () => { document.documentElement.style.fontSize = ''; };
@@ -63,10 +92,19 @@ function ThemedLayout() {
           <div className="h-9 w-9 rounded-xl glow-sm flex items-center justify-center" style={{background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))'}}>
             <span className="text-white font-heading font-bold text-sm">M</span>
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="font-heading font-bold text-lg leading-tight text-gradient">MyHomeAI</h1>
             <p className="text-[11px] text-muted-foreground leading-tight">Your smart home assistant</p>
           </div>
+          {showClearButton && (
+            <button
+              onClick={clearHistory}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-destructive border border-destructive/20 hover:bg-destructive/10 transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear History
+            </button>
+          )}
         </div>
       </header>
 
