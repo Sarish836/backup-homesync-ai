@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarDays } from 'lucide-react';
 import { isSameDay } from 'date-fns';
 import FileUploadZone from '../components/shared/FileUploadZone';
 import EmptyState from '../components/shared/EmptyState';
 import EventCard from '../components/events/EventCard';
+import PartyEventCard from '../components/events/PartyEventCard';
+import PartyPlanner from '../components/events/PartyPlanner';
 import MiniCalendar from '../components/events/MiniCalendar';
 import AddressSetup from '../components/shared/AddressSetup';
 import { useLocationAndProfile } from '../hooks/useLocationAndProfile';
@@ -19,11 +21,6 @@ export default function LifeSync() {
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
     queryFn: () => base44.entities.Event.list('-date', 100),
-  });
-
-  const createEvent = useMutation({
-    mutationFn: (data) => base44.entities.Event.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['events'] }),
   });
 
   const handleFileUploaded = async (fileUrl) => {
@@ -69,11 +66,12 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
       }
     });
 
-    await createEvent.mutateAsync({
+    await base44.entities.Event.create({
       ...extracted,
       file_url: fileUrl,
       checklist: (extracted.checklist || []).map(c => ({ ...c, checked: false })),
     });
+    queryClient.invalidateQueries({ queryKey: ['events'] });
     setProcessing(false);
   };
 
@@ -85,10 +83,15 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
     <div className="space-y-5">
       <div>
         <h2 className="font-heading font-bold text-xl text-foreground">Life Sync</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Capture events from flyers & get travel reminders</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Capture events from flyers & plan gatherings</p>
       </div>
 
       <AddressSetup profile={profile} onSave={saveProfile} />
+
+      <PartyPlanner
+        profile={profile}
+        onEventCreated={() => queryClient.invalidateQueries({ queryKey: ['events'] })}
+      />
 
       <FileUploadZone
         onFileUploaded={handleFileUploaded}
@@ -120,13 +123,15 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
         <EmptyState
           icon={CalendarDays}
           title={selectedDate ? "No events on this day" : "No events yet"}
-          description="Upload a photo of a flyer or invitation to extract event details"
+          description="Upload a flyer or plan a party to get started"
         />
       ) : (
         <div className="space-y-3">
-          {filteredEvents.map(event => (
-            <EventCard key={event.id} event={event} />
-          ))}
+          {filteredEvents.map(event =>
+            event.is_party
+              ? <PartyEventCard key={event.id} event={event} />
+              : <EventCard key={event.id} event={event} />
+          )}
         </div>
       )}
     </div>

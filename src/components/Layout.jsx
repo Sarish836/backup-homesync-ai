@@ -1,9 +1,10 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Receipt, CalendarDays, Refrigerator, Wrench, UserCircle } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '../hooks/useTheme';
+import OnboardingModal from './shared/OnboardingModal';
 
 const tabs = [
   { path: '/', icon: Receipt, label: 'Bills' },
@@ -14,7 +15,8 @@ const tabs = [
 ];
 
 function ThemedLayout() {
-  const { data: profile } = useQuery({
+  const queryClient = useQueryClient();
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
       const list = await base44.entities.UserProfile.list();
@@ -23,11 +25,22 @@ function ThemedLayout() {
   });
   useTheme(profile?.theme || 'default');
 
+  const needsOnboarding = !profileLoading && !profile?.username && !profile?.home_address;
+
+  const handleOnboardingComplete = async (form) => {
+    await base44.entities.UserProfile.create({
+      username: form.name,
+      home_address: form.home_address,
+    });
+    queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+  };
+
   const location = useLocation();
   const fontSize = { small: '13px', medium: '15px', large: '17px' }[profile?.font_size] || '15px';
 
   return (
     <div className="min-h-screen bg-background font-body flex flex-col" style={{ fontSize }}>
+      {needsOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
