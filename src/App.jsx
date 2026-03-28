@@ -7,6 +7,11 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
 import DocumentScanner from './pages/DocumentScanner';
+import LifeSync from './pages/LifeSync';
+import FridgeVision from './pages/FridgeVision';
+import HomeFixIt from './pages/HomeFixIt';
+import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -36,6 +41,11 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<DocumentScanner />} />
+        <Route path="/event-planner" element={<LifeSync />} />
+        <Route path="/fridge" element={<FridgeVision />} />
+        <Route path="/fix-it" element={<HomeFixIt />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -55,7 +55,7 @@ function ThemedLayout() {
     <div className="min-h-screen bg-background font-body flex flex-col">
       {needsOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+        <div className="max-w-4xl mx-auto px-6 py-3 flex items-center gap-3">
           <div className="h-9 w-9 rounded-xl glow-sm flex items-center justify-center" style={{background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))'}}>
             <span className="text-white font-heading font-bold text-sm">M</span>
           </div>
@@ -66,12 +66,12 @@ function ThemedLayout() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-5 pb-24">
+      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-6 pb-28">
         <Outlet />
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/40">
-        <div className="max-w-2xl mx-auto flex">
+        <div className="max-w-4xl mx-auto flex">
           {tabs.map(({ path, icon: Icon, label }) => {
             const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
             return (
