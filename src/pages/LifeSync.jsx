@@ -28,19 +28,19 @@ export default function LifeSync() {
     setProcessing(true);
     const homeAddress = profile?.home_address || '';
     const extracted = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are an event extraction AI. Analyze this image of a flyer, invitation, or handwritten note.
+      prompt: `You are an expert event extraction AI. Carefully analyze this flyer, invitation, or note.
 
-Extract:
-- Event name
-- Date (in YYYY-MM-DD format)
-- Time (e.g. "3:00 PM")
-- Location/address
-- A brief description
-- A "Don't Forget" checklist of things the attendee should bring or prepare
+You MUST extract ALL of the following — do not leave any blank if the information exists anywhere in the image:
+- Event name (required)
+- Date: look for any date, day of week, or time reference. Output in YYYY-MM-DD format. Today is ${new Date().toISOString().split('T')[0]}.
+- Time: look for any start time (e.g. "3:00 PM", "7pm", "noon"). Always extract if present.
+- Location: extract the FULL address or venue name. Look everywhere in the image including footers, small text, map references.
+- Description: a 1-2 sentence summary of what the event is.
+- Checklist: generate a "Don't Forget" list of 3-6 practical items the attendee should bring or prepare. Base it on the event type (e.g. birthday party → gift, card; sports event → comfortable shoes, water bottle; formal dinner → dress code reminder). Always provide at least 3 checklist items.
 
-${homeAddress ? `TRAVEL TIME: The user's home address is "${homeAddress}". Estimate how many minutes it would take to drive from their home to the event location. Also calculate what time they need to leave home to arrive at the event on time (factor in the event start time). Provide a "leave_by_time" like "2:15 PM".` : 'Set travel_time_minutes to null if no home address is available.'}
+${homeAddress ? `TRAVEL TIME: The user lives at "${homeAddress}". Estimate driving time in minutes from their home to the event. Calculate what time they must leave to arrive on time (factor in start time). Provide leave_by_time like "2:15 PM".` : ''}
 
-If the date is relative (e.g., "this Saturday"), estimate based on today being ${new Date().toISOString().split('T')[0]}.`,
+IMPORTANT: Never leave date, time, location, or checklist empty if the information can be inferred or estimated from context.`,
       file_urls: [fileUrl],
       response_json_schema: {
         type: "object",

@@ -25,7 +25,6 @@ const BANKING_TYPES = ['Bank Statement', 'Loan Estimate', 'Closing Disclosure', 
 
 export default function DocumentScanner() {
   const [processing, setProcessing] = useState(false);
-  const [detectingType, setDetectingType] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const queryClient = useQueryClient();
 
@@ -44,34 +43,46 @@ export default function DocumentScanner() {
   });
 
   const handleFileUploaded = async (fileUrl) => {
-    setDetectingType(true);
+    setProcessing(true);
 
-    // Step 1: Auto-detect document type
-    const detection = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a document classifier. Look at this document and determine what type it is.
+    // Single combined LLM call: detect type + analyze bill simultaneously
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are an expert financial document auditor. First identify what type of document this is, then perform a full analysis.
 
-Classify it as one of these categories:
-- "bill" with sub-type: utility | medical | internet | insurance | other
-- "banking" with sub-type: Bank Statement | Loan Estimate | Closing Disclosure | Tax Return | Pay Stub
+Step 1 — Classify:
+- If it's a Bill/Invoice (utility, medical, internet, insurance, other) → set category="bill"
+- If it's a banking/loan document (Bank Statement, Loan Estimate, Closing Disclosure, Tax Return, Pay Stub) → set category="banking" and set sub_type accordingly
 
-Also extract the company/institution name from the document.`,
+Step 2 — If category is "bill", perform a DEEP AUDIT:
+Extract title, company name, total amount, all line items. Flag overcharges, duplicate charges, math errors, hidden fees, wrong rates. For medical bills: cross-check CPT codes, insurance underpayment, balance billing. Calculate potential_savings. Provide company phone number and a negotiation script referencing specific dollar amounts and issues.
+
+If category is "banking", just provide document_type and company_name — the full audit runs separately.`,
       file_urls: [fileUrl],
       response_json_schema: {
         type: "object",
         properties: {
           category: { type: "string", enum: ["bill", "banking"] },
           sub_type: { type: "string" },
-          company_name: { type: "string", description: "Name of the company or institution on the document" }
+          company_name: { type: "string" },
+          // Bill fields
+          title: { type: "string" },
+          bill_category: { type: "string", enum: ["utility", "medical", "internet", "insurance", "other"] },
+          total_amount: { type: "number" },
+          potential_savings: { type: "number" },
+          hospital_name: { type: "string" },
+          insurance_paid: { type: "number" },
+          insurance_should_pay: { type: "number" },
+          cdm_issues: { type: "array", items: { type: "object", properties: { charge_code: { type: "string" }, description: { type: "string" }, billed_amount: { type: "number" }, cdm_rate: { type: "number" }, insurance_paid: { type: "number" }, issue: { type: "string" } } } },
+          line_items: { type: "array", items: { type: "object", properties: { description: { type: "string" }, amount: { type: "number" }, is_overcharge: { type: "boolean" }, fair_price: { type: "number" }, reason: { type: "string" } } } },
+          company_phone: { type: "string" },
+          negotiation_script: { type: "string" }
         }
       }
     });
 
-    setDetectingType(false);
-    setProcessing(true);
-
-    if (detection.category === 'banking') {
-      // Banking document flow
-      const docType = BANKING_TYPES.includes(detection.sub_type) ? detection.sub_type : 'Bank Statement';
+    if (result.category === 'banking') {
+      const BANKING_TYPES = ['Bank Statement', 'Loan Estimate', 'Closing Disclosure', 'Tax Return', 'Pay Stub'];
+      const docType = BANKING_TYPES.includes(result.sub_type) ? result.sub_type : 'Bank Statement';
       const newDoc = await base44.entities.BankingDocument.create({
         document_type: docType,
         file_url: fileUrl,
@@ -81,130 +92,21 @@ Also extract the company/institution name from the document.`,
       await base44.functions.invoke('auditBankingDocument', { document_id: newDoc.id });
       queryClient.invalidateQueries({ queryKey: ['banking-documents'] });
     } else {
-      // Bill flow
-      const analysis = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert financial bill auditor and consumer advocate AI trained in patient bill statement analysis. Your job is to find EVERY possible payment mistake, overcharge, or opportunity to save money on this bill.
-
-ANALYZE EVERY LINE ITEM and flag ALL of the following:
-
-GENERAL PAYMENT MISTAKES:
-1. Duplicate charges - same service billed twice or more
-2. Incorrect amounts - charges not matching contracted or advertised rates
-3. Charges for services not received
-4. Wrong billing codes or misclassified services
-5. Math errors - line items that do not add up to the total
-6. Incorrect tax calculations
-7. Late fees applied incorrectly or waivable
-8. Service fees added without prior disclosure
-9. Promotional rates not applied correctly
-10. Credits or discounts not applied
-
-FOR MEDICAL / PATIENT BILLS - DEEP ANALYSIS:
-A. ITEMIZED BILL AUDIT
- - Review every line item charge individually
- - Compare each CPT/HCPCS code to the standard national average reimbursement rate
- - Flag any charge exceeding the Medicare rate by more than 200%
- - Identify revenue codes (e.g., 0250 Pharmacy, 0360 OR, 0450 ER) and verify they match services listed
- - Flag chargemaster (CDM) rates vs actual allowed amounts
-
-B. INSURANCE EOB CROSS-REFERENCE
- - Compare what the insurer allowed vs what was billed
- - Identify if the provider billed more than the contracted network rate
- - Flag insurance underpayment
- - Detect balance billing (illegal for in-network providers in most states)
- - Check deductible applied correctly per plan year
- - Verify co-pay and co-insurance calculated on the ALLOWED amount, not the billed amount
-
-C. CPT/PROCEDURE CODE ANALYSIS
- - Upcoding: billed for a more complex procedure than performed
- - Unbundling: billing separately for services CMS requires bundled
- - Modifier abuse: using modifiers (25, 59) without clinical justification
- - Mutually exclusive codes billed together
- - Facility vs professional fee duplication
-
-D. PATIENT RESPONSIBILITY CALCULATION
- - Verify patient responsibility = Allowed Amount minus Insurance Payment minus Contractual Adjustment
- - Check if out-of-pocket maximum has been reached (patient owes $0 after)
- - Verify coordination of benefits if patient has secondary insurance
- - Check financial assistance / charity care eligibility
- - Flag if no itemized bill was provided
-
-E. TIMING AND AUTHORIZATION ERRORS
- - Pre-authorization not obtained
- - Timely filing limit issues
- - Retroactive denial of coverage
- - Emergency services balance billing (illegal)
-
-F. HIDDEN CHARGES TO FLAG
- - Facility fees for telehealth or basic office visits
- - Observation status vs inpatient admission
- - Supplies included in procedure fee billed separately
- - Anesthesia time in excess of actual procedure time
- - Pharmacy charges for medications the patient brought from home
-
-FOR UTILITY BILLS:
- - Compare rates against typical regional rates
- - Check for meter reading errors
- - Flag demand charges and delivery fees
-
-FOR INTERNET/CABLE/PHONE BILLS:
- - Equipment rental vs buying outright
- - Promotional rate expirations
- - Fees disguised as taxes
-
-FOR INSURANCE BILLS:
- - Premium increases without notice
- - Wrong coverage tier billed
-
-For EVERY line item state if it is legitimate or an overcharge and provide the fair price.
-Calculate total_amount (what was billed) and potential_savings (total that could be disputed).
-Provide a firm negotiation script referencing exact issues, dollar amounts, code numbers, and legal rights.
-Include the billing/customer service phone number from the document.`,
-        file_urls: [fileUrl],
-        response_json_schema: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            category: { type: "string", enum: ["utility", "medical", "internet", "insurance", "other"] },
-            total_amount: { type: "number" },
-            potential_savings: { type: "number" },
-            hospital_name: { type: "string" },
-            insurance_paid: { type: "number" },
-            insurance_should_pay: { type: "number" },
-            cdm_issues: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  charge_code: { type: "string" },
-                  description: { type: "string" },
-                  billed_amount: { type: "number" },
-                  cdm_rate: { type: "number" },
-                  insurance_paid: { type: "number" },
-                  issue: { type: "string" }
-                }
-              }
-            },
-            line_items: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  description: { type: "string" },
-                  amount: { type: "number" },
-                  is_overcharge: { type: "boolean" },
-                  fair_price: { type: "number" },
-                  reason: { type: "string" }
-                }
-              }
-            },
-            company_phone: { type: "string" },
-            negotiation_script: { type: "string" }
-          }
-        }
+      await base44.entities.Bill.create({
+        title: result.title || result.company_name || 'Bill',
+        category: result.bill_category || 'other',
+        total_amount: result.total_amount,
+        potential_savings: result.potential_savings,
+        hospital_name: result.hospital_name,
+        insurance_paid: result.insurance_paid,
+        insurance_should_pay: result.insurance_should_pay,
+        cdm_issues: result.cdm_issues,
+        line_items: result.line_items,
+        company_phone: result.company_phone,
+        negotiation_script: result.negotiation_script,
+        file_url: fileUrl,
+        status: 'reviewed',
       });
-
-      await base44.entities.Bill.create({ ...analysis, file_url: fileUrl, status: 'reviewed' });
       queryClient.invalidateQueries({ queryKey: ['bills'] });
     }
 
@@ -228,7 +130,7 @@ Include the billing/customer service phone number from the document.`,
   const totalSavings = bills.reduce((sum, b) => sum + (b.potential_savings || 0), 0);
   const flaggedDocs = bankDocs.filter(d => d.status === 'flagged');
   const hasAnyDocs = bills.length > 0 || bankDocs.length > 0;
-  const isProcessing = detectingType || processing;
+  const isProcessing = processing;
 
   return (
     <div className="space-y-5">
@@ -268,13 +170,7 @@ Include the billing/customer service phone number from the document.`,
 
       {/* Upload */}
       <div className="space-y-2">
-        {detectingType && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-sm text-primary font-medium px-1">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Detecting document type…
-          </motion.div>
-        )}
+
         <FileUploadZone
           onFileUploaded={handleFileUploaded}
           label="Upload any bill, statement, or financial document"
