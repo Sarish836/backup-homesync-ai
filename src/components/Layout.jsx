@@ -4,7 +4,7 @@ import { ScanText, CalendarDays, Refrigerator, Wrench, UserCircle, Shield, Home 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '../hooks/useTheme';
-import OnboardingModal from './shared/OnboardingModal';
+import OnboardingModal from './shared/OnboardingModal.jsx';
 
 const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmohanty.live@gmail.com', 'samarthravi30@gmail.com'];
 
