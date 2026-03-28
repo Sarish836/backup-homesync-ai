@@ -50,7 +50,7 @@ ${staplesList ? `4. MISSING STAPLES: The user expects to always have these items
 
 Be practical and suggest everyday recipes a home cook can make.`,
       file_urls: [fileUrl],
-      add_context_from_internet: !!(locationStr || homeAddress),
+      add_context_from_internet: false,
       response_json_schema: {
         type: "object",
         properties: {

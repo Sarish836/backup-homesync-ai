@@ -42,17 +42,7 @@ export default function RepairCard({ job, homeAddress }) {
     const partNames = (job.parts_list || []).map(p => p.name).join(', ');
     const location = homeAddress || 'the user location';
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 3 different hardware/home improvement stores near "${location}" where someone can buy ALL of these repair parts in one trip: ${partNames}.
-
-For each store, provide:
-- store name (e.g. Home Depot, Lowe's, Ace Hardware, Menards, True Value)
-- address
-- estimated distance in miles
-- estimated total price for all parts combined
-
-Suggest DIFFERENT stores than: ${allStores.join(', ')}.
-Use real store names only.`,
-      add_context_from_internet: true,
+      prompt: `Find 3 different hardware/home improvement stores near "${location}" where someone can buy ALL of these repair parts in one trip: ${partNames}. Suggest stores like Home Depot, Lowe's, Ace Hardware, Menards, True Value. For each provide: store name, address, estimated distance in miles, estimated total price for all parts combined.`,
       response_json_schema: {
         type: "object",
         properties: {
