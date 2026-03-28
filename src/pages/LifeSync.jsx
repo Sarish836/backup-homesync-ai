@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, AlertTriangle } from 'lucide-react';
 import { isSameDay } from 'date-fns';
 import FileUploadZone from '../components/shared/FileUploadZone';
 import EmptyState from '../components/shared/EmptyState';
@@ -81,6 +81,21 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
     ? events.filter(e => e.date && isSameDay(new Date(e.date), selectedDate))
     : events;
 
+  // Detect conflicts: events on the same date+time
+  const conflicts = [];
+  const seen = {};
+  events.forEach(e => {
+    if (!e.date) return;
+    const key = `${e.date}|${e.time || 'notime'}`;
+    if (seen[key]) {
+      const existing = conflicts.find(c => c.key === key);
+      if (existing) existing.events.push(e);
+      else conflicts.push({ key, events: [seen[key], e] });
+    } else {
+      seen[key] = e;
+    }
+  });
+
   return (
     <div className="space-y-5">
       <div>
@@ -101,6 +116,31 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
         isProcessing={processing}
         accept="image/*"
       />
+
+      {conflicts.length > 0 && (
+        <div className="space-y-2">
+          {conflicts.map(conflict => (
+            <div key={conflict.key} className="rounded-xl border border-yellow-400/40 bg-yellow-50 dark:bg-yellow-900/20 p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-600 shrink-0" />
+                <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">Scheduling Conflict — pick one:</p>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {conflict.events.map(e => (
+                  <div key={e.id} className="flex items-center gap-2 bg-white dark:bg-card rounded-lg px-3 py-2 border border-yellow-200/60">
+                    <CalendarDays className="w-3.5 h-3.5 text-yellow-600 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{e.name}</p>
+                      {e.location && <p className="text-[11px] text-muted-foreground truncate">{e.location}</p>}
+                    </div>
+                    <span className="text-[11px] text-muted-foreground shrink-0">{e.time || e.date}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <MiniCalendar
         events={events}

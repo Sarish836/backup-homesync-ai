@@ -53,7 +53,7 @@ function ThemedLayout() {
   }, [fontSize]);
 
   return (
-    <div className="min-h-screen bg-background font-body flex flex-col">
+    <div className="min-h-screen h-full bg-background font-body flex flex-col" style={{ minHeight: '100dvh' }}>
       {needsOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <header className="sticky top-0 z-40 glass border-b border-border/40">
         <div className="max-w-4xl mx-auto px-6 py-3 flex items-center gap-3">

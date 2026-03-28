@@ -124,12 +124,15 @@ export default function Profile() {
             </div>
           </div>
           <button
+            type="button"
             onClick={() => handleSave({ dark_mode: !profile?.dark_mode })}
             className="relative rounded-full transition-all duration-300 shrink-0"
-            style={{width:'48px', height:'26px', background: profile?.dark_mode ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
+            style={{ width: '44px', height: '24px', background: profile?.dark_mode ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))' }}
           >
-            <span className="absolute top-[3px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
-              style={{ transform: profile?.dark_mode ? 'translateX(24px)' : 'translateX(3px)' }} />
+            <span
+              className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
+              style={{ transform: profile?.dark_mode ? 'translateX(22px)' : 'translateX(2px)' }}
+            />
           </button>
         </div>
       </motion.div>
@@ -304,12 +307,17 @@ function Toggle({ label, description, value, onChange }) {
         <p className="text-sm font-medium text-foreground">{label}</p>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
-      <label className="relative inline-flex items-center cursor-pointer shrink-0">
-        <input type="checkbox" className="sr-only" checked={value} onChange={() => onChange(!value)} />
-        <div className={`w-11 h-6 rounded-full transition-colors duration-200 ${value ? 'bg-primary' : 'bg-muted'}`}>
-          <div className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${value ? 'translate-x-5' : 'translate-x-0'}`} />
-        </div>
-      </label>
+      <button
+        type="button"
+        onClick={() => onChange(!value)}
+        className="relative shrink-0 rounded-full transition-all duration-300"
+        style={{ width: '44px', height: '24px', background: value ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}
+      >
+        <span
+          className="absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
+          style={{ transform: value ? 'translateX(22px)' : 'translateX(2px)' }}
+        />
+      </button>
     </div>
   );
 }

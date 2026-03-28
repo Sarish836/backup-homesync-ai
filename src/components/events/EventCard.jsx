@@ -32,10 +32,11 @@ export default function EventCard({ event, homeAddress }) {
     setEditing(false);
   };
 
-  const mapsUrl = event.location
+  const locationToUse = event.location || '';
+  const mapsUrl = locationToUse
     ? homeAddress
-      ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(homeAddress)}&destination=${encodeURIComponent(event.location)}`
-      : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(event.location)}`
+      ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(homeAddress)}&destination=${encodeURIComponent(locationToUse)}&travelmode=driving`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationToUse)}`
     : null;
 
   const eventDate = event.date ? new Date(event.date) : null;
