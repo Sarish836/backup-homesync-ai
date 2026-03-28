@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import FadedImage from '../shared/FadedImage';
 
 export default function EventCard({ event, homeAddress }) {
   const queryClient = useQueryClient();
@@ -68,6 +69,7 @@ export default function EventCard({ event, homeAddress }) {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="card-premium overflow-hidden">
         <CardContent className="p-4">
+          <FadedImage src={event.file_url} alt="event flyer" />
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
               <h3 className="font-heading font-semibold text-foreground">{event.name}</h3>

@@ -8,6 +8,7 @@ import EmptyState from '../components/shared/EmptyState';
 import AuditReport from '../components/banking/AuditReport';
 import LoanReadiness from '../components/banking/LoanReadiness';
 import { Badge } from '@/components/ui/badge';
+import FadedImage from '../components/shared/FadedImage';
 
 const bankingStatusConfig = {
   pending: { label: 'Pending', color: 'text-muted-foreground', bg: 'bg-muted', icon: Clock },
@@ -274,8 +275,8 @@ Include the billing/customer service phone number from the document.`,
                 <div className={`card-premium rounded-2xl border bg-card overflow-hidden ${doc.status === 'flagged' ? 'border-destructive/30' : ''}`}>
                   <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))' }} />
                   <div className="p-4 cursor-pointer" onClick={() => hasReport && setExpandedId(isExpanded ? null : doc.id)}>
-
-                   <div className="flex items-center justify-between gap-3">
+                   <FadedImage src={doc.file_url} alt="document" />
+                  <div className="flex items-center justify-between gap-3">
                      <div className="flex items-center gap-3 flex-1 min-w-0">
                        <div className="h-9 w-9 rounded-xl shrink-0 flex items-center justify-center bg-primary/10">
                          <Landmark className="w-4 h-4 text-primary" />
@@ -330,8 +331,8 @@ Include the billing/customer service phone number from the document.`,
                 <div className="card-premium rounded-2xl border bg-card overflow-hidden">
                   <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, hsl(var(--accent)), hsl(var(--primary)))' }} />
                   <div className="p-4">
-
-                   <div className="flex items-start justify-between">
+                   <FadedImage src={bill.file_url} alt="bill" />
+                  <div className="flex items-start justify-between">
                      <div className="flex items-center gap-3 flex-1 min-w-0">
                        <div className="h-9 w-9 rounded-xl shrink-0 flex items-center justify-center bg-accent/10">
                          <Receipt className="w-4 h-4 text-accent" />
