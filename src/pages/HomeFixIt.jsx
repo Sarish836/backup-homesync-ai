@@ -48,7 +48,7 @@ export default function HomeFixIt() {
 
 ${locationContext && `8. IF damage_rating is 7 or higher OR difficulty is professional_required: Search for real professionals near "${locationContext}" who can fix this type of repair. Provide their name, phone number, specialty, and estimated cost range. Include at least 2-3 real businesses if possible.`}`,
       file_urls: [fileUrl],
-      add_context_from_internet: false,
+      add_context_from_internet: !!(locationContext),
       response_json_schema: {
         type: "object",
         properties: {
