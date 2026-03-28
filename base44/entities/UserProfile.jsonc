@@ -10,6 +10,10 @@
       "type": "string",
       "description": "User phone number"
     },
+    "email": {
+      "type": "string",
+      "description": "User email (editable)"
+    },
     "home_address": {
       "type": "string",
       "description": "Street address"
@@ -33,6 +37,10 @@
     "avatar_color": {
       "type": "string",
       "description": "User's chosen avatar color hex"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "User's uploaded profile photo URL"
     },
     "theme": {
       "type": "string",

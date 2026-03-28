@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Receipt, CalendarDays, Refrigerator, Wrench, UserCircle, Shield, Landmark } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -47,8 +47,13 @@ function ThemedLayout() {
   const location = useLocation();
   const fontSize = { small: '13px', medium: '15px', large: '17px' }[profile?.font_size] || '15px';
 
+  React.useEffect(() => {
+    document.documentElement.style.fontSize = fontSize;
+    return () => { document.documentElement.style.fontSize = ''; };
+  }, [fontSize]);
+
   return (
-    <div className="min-h-screen bg-background font-body flex flex-col" style={{ fontSize }}>
+    <div className="min-h-screen bg-background font-body flex flex-col">
       {needsOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <header className="sticky top-0 z-40 glass border-b border-border/40">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">

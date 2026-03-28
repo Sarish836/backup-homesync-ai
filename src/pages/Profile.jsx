@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Palette, Settings, Bell, Check, LogOut, MapPin, Phone, Mail, Sun, Moon } from 'lucide-react';
+import { User, Palette, Settings, Bell, Check, LogOut, MapPin, Phone, Mail, Sun, Moon, Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { ACCENT_OPTIONS } from '../hooks/useTheme';
@@ -21,6 +21,8 @@ export default function Profile() {
   const [usernameError, setUsernameError] = useState('');
   const [addressForm, setAddressForm] = useState({ home_address: '', phone: '', email: '' });
   const [addressInitialized, setAddressInitialized] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef(null);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -70,6 +72,14 @@ export default function Profile() {
     if (profile?.username) setUsernameInput(profile.username);
   }, [profile?.username]);
 
+  const handleAvatarUpload = async (file) => {
+    if (!file) return;
+    setUploadingAvatar(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    handleSave({ avatar_url: file_url });
+    setUploadingAvatar(false);
+  };
+
   useEffect(() => {
     if (profile && !addressInitialized) {
       setAddressForm({
@@ -86,10 +96,10 @@ export default function Profile() {
     : user?.email?.[0]?.toUpperCase() || '?';
 
   const avatarColor = profile?.avatar_color || '#2d9b6f';
-  const fontSize = { small: '13px', medium: '15px', large: '17px' }[profile?.font_size] || '15px';
+  const avatarUrl = profile?.avatar_url || null;
 
   return (
-    <div className="space-y-6 pb-8" style={{ fontSize }}>
+    <div className="space-y-6 pb-8">
       {/* Header */}
       <div>
         <h2 className="font-heading font-bold text-xl text-foreground">Profile & Settings</h2>
@@ -111,10 +121,11 @@ export default function Profile() {
           </div>
           <button
             onClick={() => handleSave({ dark_mode: !profile?.dark_mode })}
-            className={`relative h-7 w-13 rounded-full transition-all duration-300 ${profile?.dark_mode ? 'glow-sm' : ''}`}
-            style={{width:'52px', background: profile?.dark_mode ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
+            className="relative rounded-full transition-all duration-300 shrink-0"
+            style={{width:'48px', height:'26px', background: profile?.dark_mode ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
           >
-            <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300 ${profile?.dark_mode ? 'translate-x-7' : 'translate-x-1'}`} />
+            <span className="absolute top-[3px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
+              style={{ transform: profile?.dark_mode ? 'translateX(24px)' : 'translateX(3px)' }} />
           </button>
         </div>
       </motion.div>
@@ -123,11 +134,20 @@ export default function Profile() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         className="card-premium bg-card rounded-2xl border border-border/50 p-5 flex items-center gap-4"
         style={{background:'linear-gradient(135deg,hsl(var(--card)),hsl(var(--primary)/0.04))'}}>
-        <div
-          className="h-16 w-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold font-heading shrink-0 glow-primary"
-          style={{ background: avatarColor }}
-        >
-          {initials}
+        <div className="relative shrink-0 cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
+          <div
+            className="h-16 w-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold font-heading glow-primary overflow-hidden"
+            style={{ background: avatarUrl ? undefined : avatarColor }}
+          >
+            {avatarUrl
+              ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+              : initials
+            }
+          </div>
+          <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-primary flex items-center justify-center shadow-md">
+            {uploadingAvatar ? <Loader2 className="w-3 h-3 text-white animate-spin" /> : <Camera className="w-3 h-3 text-white" />}
+          </div>
+          <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={e => handleAvatarUpload(e.target.files[0])} />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-heading font-semibold text-foreground truncate">{user?.full_name || 'Your Name'}</p>
@@ -171,9 +191,10 @@ export default function Profile() {
             <input
               type="email"
               value={addressForm.email}
-              readOnly
-              placeholder="Email"
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-muted text-muted-foreground cursor-not-allowed"
+              onChange={(e) => setAddressForm(f => ({ ...f, email: e.target.value }))}
+              onBlur={(e) => handleSave({ email: e.target.value })}
+              placeholder="Email address"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
         </div>
@@ -281,10 +302,11 @@ function Toggle({ label, description, value, onChange }) {
       </div>
       <button
         onClick={() => onChange(!value)}
-        className="relative h-6 w-11 rounded-full transition-all duration-300"
-        style={{background: value ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
+        className="relative rounded-full transition-all duration-300 shrink-0"
+        style={{width:'48px', height:'26px', background: value ? 'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))' : 'hsl(var(--muted))'}}
       >
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300 ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
+        <span className="absolute top-[3px] h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300"
+          style={{ transform: value ? 'translateX(24px)' : 'translateX(3px)' }} />
       </button>
     </div>
   );

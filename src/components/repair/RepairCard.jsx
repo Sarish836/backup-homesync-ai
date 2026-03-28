@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign, Phone, Store, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign, Phone, Store, Trash2, RefreshCw, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,17 +13,90 @@ const difficultyConfig = {
   professional_required: { label: 'Hire a Pro', color: 'bg-destructive text-destructive-foreground' },
 };
 
-export default function RepairCard({ job }) {
+export default function RepairCard({ job, homeAddress }) {
   const [expanded, setExpanded] = useState(false);
+  const [selectedStore, setSelectedStore] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const queryClient = useQueryClient();
   const config = difficultyConfig[job.difficulty] || difficultyConfig.moderate;
+  const isPro = job.difficulty === 'professional_required';
 
   const handleDelete = async () => {
     if (!confirm('Delete this repair job?')) return;
     await base44.entities.RepairJob.delete(job.id);
     queryClient.invalidateQueries({ queryKey: ['repair-jobs'] });
   };
-  const isPro = job.difficulty === 'professional_required';
+
+  // Collect unique stores across all parts
+  const allStores = [];
+  (job.parts_list || []).forEach(part => {
+    (part.local_store_prices || []).forEach(s => {
+      if (s.store && !allStores.includes(s.store)) allStores.push(s.store);
+    });
+  });
+  const currentStore = allStores[selectedStore];
+
+  const refreshStores = async () => {
+    setRefreshing(true);
+    const partNames = (job.parts_list || []).map(p => p.name).join(', ');
+    const location = homeAddress || 'the user location';
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `Find 3 different hardware/home improvement stores near "${location}" where someone can buy ALL of these repair parts in one trip: ${partNames}.
+
+For each store, provide:
+- store name (e.g. Home Depot, Lowe's, Ace Hardware, Menards, True Value)
+- address
+- estimated distance in miles
+- estimated total price for all parts combined
+
+Suggest DIFFERENT stores than: ${allStores.join(', ')}.
+Use real store names only.`,
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          stores: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                store: { type: "string" },
+                address: { type: "string" },
+                distance_miles: { type: "string" },
+                estimated_total: { type: "string" }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const newStores = result.stores || [];
+    const updatedPartsList = (job.parts_list || []).map(part => ({
+      ...part,
+      local_store_prices: newStores.map(s => ({
+        store: s.store,
+        price: 'see total',
+        distance_miles: s.distance_miles,
+        store_address: s.address,
+        estimated_total: s.estimated_total,
+      }))
+    }));
+
+    await base44.entities.RepairJob.update(job.id, { parts_list: updatedPartsList });
+    queryClient.invalidateQueries({ queryKey: ['repair-jobs'] });
+    setSelectedStore(0);
+    setRefreshing(false);
+  };
+
+  const getMapsUrl = (storeName, storeAddress) => {
+    const dest = storeAddress || storeName;
+    const origin = homeAddress || '';
+    if (origin) return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest)}`;
+  };
+
+  const currentStoreData = (job.parts_list?.[0]?.local_store_prices || []).find(s => s.store === currentStore);
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
@@ -75,37 +147,84 @@ export default function RepairCard({ job }) {
             )}
           </div>
 
-          {/* Parts list */}
+          {/* Parts list with store tabs */}
           {job.parts_list?.length > 0 && (
             <div className="mt-3 pt-3 border-t border-border/50">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Parts Needed</p>
-              <div className="space-y-2">
-                {job.parts_list.map((part, idx) => (
-                  <div key={idx} className="bg-muted/50 rounded-lg p-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-foreground">{part.name}</span>
-                      <div className="flex items-center gap-2">
-                        {part.estimated_cost && <span className="text-xs text-muted-foreground">{part.estimated_cost}</span>}
-                        {part.search_url && (
-                          <a href={part.search_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                    {part.local_store_prices?.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {part.local_store_prices.map((s, i) => (
-                          <span key={i} className="flex items-center gap-1 text-[10px] bg-background border border-border px-1.5 py-0.5 rounded">
-                            <Store className="w-2.5 h-2.5 text-muted-foreground" />
-                            {s.store} <strong>{s.price}</strong>
-                            {s.distance_miles && <span className="text-muted-foreground">· {s.distance_miles}mi</span>}
-                          </span>
-                        ))}
-                      </div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Materials Needed</p>
+                <button
+                  onClick={refreshStores}
+                  disabled={refreshing}
+                  className="flex items-center gap-1 text-xs text-primary hover:underline font-medium disabled:opacity-50"
+                >
+                  {refreshing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                  Find other stores
+                </button>
+              </div>
+
+              {/* Store Tabs */}
+              {allStores.length > 0 && (
+                <div className="flex gap-1.5 mb-3 overflow-x-auto pb-1">
+                  {allStores.map((store, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedStore(i)}
+                      className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+                        selectedStore === i
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-background border-border text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {store}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Selected store summary + directions */}
+              {currentStore && (
+                <a
+                  href={getMapsUrl(currentStore, currentStoreData?.store_address)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between bg-primary/5 border border-primary/10 rounded-xl px-3 py-2 mb-3 hover:bg-primary/10 transition-colors"
+                >
+                  <div>
+                    <p className="text-xs font-semibold text-primary">{currentStore}</p>
+                    {currentStoreData?.distance_miles && (
+                      <p className="text-[11px] text-muted-foreground">{currentStoreData.distance_miles} miles away</p>
+                    )}
+                    {currentStoreData?.estimated_total && (
+                      <p className="text-[11px] text-primary font-medium">~{currentStoreData.estimated_total} total</p>
                     )}
                   </div>
-                ))}
+                  <ExternalLink className="w-4 h-4 text-primary shrink-0" />
+                </a>
+              )}
+
+              <div className="space-y-2">
+                {job.parts_list.map((part, idx) => {
+                  const storePriceEntry = (part.local_store_prices || []).find(s => s.store === currentStore);
+                  return (
+                    <div key={idx} className="bg-muted/50 rounded-lg p-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-foreground">{part.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {storePriceEntry?.price && storePriceEntry.price !== 'see total'
+                              ? storePriceEntry.price
+                              : part.estimated_cost || ''}
+                          </span>
+                          {part.search_url && (
+                            <a href={part.search_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

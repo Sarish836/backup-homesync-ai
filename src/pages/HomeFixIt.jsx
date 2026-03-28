@@ -40,7 +40,7 @@ export default function HomeFixIt() {
 
 4. SAFETY WARNING: Provide a warning if this is dangerous.
 
-5. PARTS LIST: List all materials needed with estimated costs. For each part provide a search URL like https://www.amazon.com/s?k={url-encoded-part-name}.${locationContext ? ` Also give local_store_prices with 2-3 stores near "${locationContext}" (e.g. Home Depot, Lowe's, Ace Hardware) with estimated prices and approximate distance.` : ''}
+5. PARTS LIST: List all materials needed with estimated costs. For each part provide a search URL like https://www.amazon.com/s?k={url-encoded-part-name}.${locationContext ? ` Also identify 3 stores near "${locationContext}" (e.g. Home Depot, Lowe's, Ace Hardware, Menards) where ALL parts can be bought in one trip. For EVERY part, provide local_store_prices with those same 3 stores, each with store name, price for that specific part, and distance_miles.` : ''}
 
 6. STEP-BY-STEP INSTRUCTIONS with tips.
 
@@ -145,7 +145,7 @@ ${locationContext && `8. IF damage_rating is 7 or higher OR difficulty is profes
 
       <div className="space-y-3">
           {jobs.map((job) =>
-        <RepairCard key={job.id} job={job} />
+        <RepairCard key={job.id} job={job} homeAddress={[profile?.home_address, profile?.city, profile?.state].filter(Boolean).join(', ')} />
         )}
         </div>
       }
