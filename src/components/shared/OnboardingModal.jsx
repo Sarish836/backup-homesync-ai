@@ -6,7 +6,9 @@ import { base44 } from '@/api/base44Client';
 
 export default function OnboardingModal({ onComplete }) {
   // mode: 'auth' | 'signup'
-  const [mode, setMode] = useState('auth');
+  // If rendered, user is already authenticated (Layout only shows this when profile === null)
+  // so skip the auth screen and go straight to signup steps
+  const [mode, setMode] = useState('signup');
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ name: '', home_address: '', skip_address: false });
 
@@ -31,6 +33,10 @@ export default function OnboardingModal({ onComplete }) {
   ];
 
   const handleLogin = () => {
+    base44.auth.redirectToLogin(window.location.href);
+  };
+
+  const handleSignUp = () => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
@@ -82,7 +88,7 @@ export default function OnboardingModal({ onComplete }) {
             </Button>
 
             <Button
-              onClick={() => setMode('signup')}
+              onClick={handleSignUp}
               className="w-full h-12 rounded-xl font-semibold text-base"
             >
               <UserPlus className="w-4 h-4 mr-2" />
