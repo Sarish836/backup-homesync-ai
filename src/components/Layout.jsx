@@ -74,7 +74,7 @@ function ThemedLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/5" style={{ background: '#0a0a0f' }}>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background">
         <div className="max-w-4xl mx-auto flex items-end">
           {tabs.map(({ path, icon: Icon, label, isHome }) => {
             const isActive = path === '/home' ? location.pathname === '/home' : (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
@@ -93,7 +93,7 @@ function ThemedLayout() {
               <Link
                 key={path}
                 to={path}
-                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all ${isActive ? 'text-primary' : 'text-gray-400 hover:text-white'}`}
+                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'nav-active-glow' : ''}`}>
                   <Icon className="w-5 h-5" strokeWidth={isActive ? 2.2 : 1.8} />
