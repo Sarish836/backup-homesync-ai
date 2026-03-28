@@ -42,10 +42,14 @@ export default function Profile() {
     queryFn: () => base44.entities.UserProfile.list(),
   });
 
+  const profileRef = React.useRef(profile);
+  React.useEffect(() => { profileRef.current = profile; }, [profile]);
+
   const saveMutation = useMutation({
     mutationFn: async (updates) => {
-      if (profile?.id) {
-        return base44.entities.UserProfile.update(profile.id, updates);
+      const current = profileRef.current;
+      if (current?.id) {
+        return base44.entities.UserProfile.update(current.id, updates);
       } else {
         return base44.entities.UserProfile.create(updates);
       }

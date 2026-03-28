@@ -12,6 +12,7 @@ import FridgeVision from './pages/FridgeVision';
 import HomeFixIt from './pages/HomeFixIt';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
+import Home from './pages/Home';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -46,6 +47,7 @@ const AuthenticatedApp = () => {
         <Route path="/fix-it" element={<HomeFixIt />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/home" element={<Home />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

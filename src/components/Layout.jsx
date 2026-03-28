@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { ScanText, CalendarDays, Refrigerator, Wrench, UserCircle, Shield } from 'lucide-react';
+import { ScanText, CalendarDays, Refrigerator, Wrench, UserCircle, Shield, Home } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '../hooks/useTheme';
@@ -11,6 +11,7 @@ const ADMIN_EMAILS = ['shreyassamal05@gmail.com', 'sarishdinesh@gmail.com', 'pmo
 const baseTabs = [
   { path: '/', icon: ScanText, label: 'Docs' },
   { path: '/event-planner', icon: CalendarDays, label: 'Events' },
+  { path: '/home', icon: Home, label: 'Home', isHome: true },
   { path: '/fridge', icon: Refrigerator, label: 'Pantry' },
   { path: '/fix-it', icon: Wrench, label: 'Repair' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
@@ -71,9 +72,20 @@ function ThemedLayout() {
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/40">
-        <div className="max-w-4xl mx-auto flex">
-          {tabs.map(({ path, icon: Icon, label }) => {
-            const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+        <div className="max-w-4xl mx-auto flex items-end">
+          {tabs.map(({ path, icon: Icon, label, isHome }) => {
+            const isActive = path === '/home' ? location.pathname === '/home' : (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
+            if (isHome) {
+              return (
+                <Link key={path} to={path} className="flex-1 flex flex-col items-center -mb-1">
+                  <div className={`relative h-14 w-14 rounded-full flex flex-col items-center justify-center shadow-lg transition-all ${isActive ? 'glow-primary scale-105' : 'hover:scale-105'}`}
+                    style={{background:'linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))'}}>
+                    <Icon className="w-6 h-6 text-white" strokeWidth={2} />
+                  </div>
+                  <span className={`text-[11px] font-semibold mt-1 pb-1 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>Home</span>
+                </Link>
+              );
+            }
             return (
               <Link
                 key={path}
