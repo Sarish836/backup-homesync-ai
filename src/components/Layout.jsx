@@ -50,29 +50,36 @@ function ThemedLayout() {
   const location = useLocation();
   const fontSize = { small: '13px', medium: '15px', large: '17px' }[profile?.font_size] || '15px';
 
+  const deleteSequentially = async (items, deleteFn) => {
+    for (const item of items) {
+      await deleteFn(item.id);
+      await new Promise(r => setTimeout(r, 150));
+    }
+  };
+
   const clearHistory = async () => {
     const path = location.pathname;
     if (!confirm('Clear all history for this tab?')) return;
     if (path === '/') {
-      const bills = await base44.entities.Bill.list();
-      const docs = await base44.entities.BankingDocument.list();
-      await Promise.all([
-        ...bills.map(b => base44.entities.Bill.delete(b.id)),
-        ...docs.map(d => base44.entities.BankingDocument.delete(d.id)),
+      const [bills, docs] = await Promise.all([
+        base44.entities.Bill.list(),
+        base44.entities.BankingDocument.list(),
       ]);
+      await deleteSequentially(bills, (id) => base44.entities.Bill.delete(id));
+      await deleteSequentially(docs, (id) => base44.entities.BankingDocument.delete(id));
       queryClient.invalidateQueries({ queryKey: ['bills'] });
       queryClient.invalidateQueries({ queryKey: ['banking-documents'] });
     } else if (path === '/event-planner') {
       const events = await base44.entities.Event.list();
-      await Promise.all(events.map(e => base44.entities.Event.delete(e.id)));
+      await deleteSequentially(events, (id) => base44.entities.Event.delete(id));
       queryClient.invalidateQueries({ queryKey: ['events'] });
     } else if (path === '/fridge') {
       const scans = await base44.entities.FridgeScan.list();
-      await Promise.all(scans.map(s => base44.entities.FridgeScan.delete(s.id)));
+      await deleteSequentially(scans, (id) => base44.entities.FridgeScan.delete(id));
       queryClient.invalidateQueries({ queryKey: ['fridge-scans'] });
     } else if (path === '/fix-it') {
       const jobs = await base44.entities.RepairJob.list();
-      await Promise.all(jobs.map(j => base44.entities.RepairJob.delete(j.id)));
+      await deleteSequentially(jobs, (id) => base44.entities.RepairJob.delete(id));
       queryClient.invalidateQueries({ queryKey: ['repair-jobs'] });
     }
   };
