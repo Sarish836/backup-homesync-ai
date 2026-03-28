@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import FadedImage from '../shared/FadedImage';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign, Phone, Store, Trash2, RefreshCw, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -103,7 +102,6 @@ Use real store names only.`,
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Card className={`card-premium overflow-hidden ${isPro ? 'border-destructive/30' : ''}`}>
         <CardContent className="p-4">
-          <FadedImage src={job.file_url} alt="damage photo" />
           {/* Safety Warning */}
           {job.safety_warning && (
             <div className="mb-3 p-3 bg-destructive/5 rounded-xl border border-destructive/10 flex gap-2">
