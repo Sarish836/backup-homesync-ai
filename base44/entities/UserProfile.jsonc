@@ -6,6 +6,43 @@
       "type": "string",
       "description": "User's home address"
     },
+    "username": {
+      "type": "string",
+      "description": "Unique display username"
+    },
+    "avatar_color": {
+      "type": "string",
+      "description": "User's chosen avatar color hex"
+    },
+    "theme": {
+      "type": "string",
+      "enum": [
+        "default",
+        "ocean",
+        "sunset",
+        "forest",
+        "midnight",
+        "rose"
+      ],
+      "description": "UI color theme"
+    },
+    "font_size": {
+      "type": "string",
+      "enum": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "description": "Preferred font size"
+    },
+    "notifications_enabled": {
+      "type": "boolean",
+      "description": "Enable in-app notifications"
+    },
+    "compact_view": {
+      "type": "boolean",
+      "description": "Use compact card layout"
+    },
     "household_staples": {
       "type": "array",
       "description": "List of items that should always be in the house",
@@ -22,5 +59,19 @@
       }
     }
   },
-  "required": []
+  "required": [],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
 }
