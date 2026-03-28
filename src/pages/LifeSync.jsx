@@ -69,6 +69,7 @@ If the date is relative (e.g., "this Saturday"), estimate based on today being $
 
     await base44.entities.Event.create({
       ...extracted,
+      name: extracted.name || 'Untitled Event',
       file_url: fileUrl,
       checklist: (extracted.checklist || []).map(c => ({ ...c, checked: false })),
     });
