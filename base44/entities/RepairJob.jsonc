@@ -16,6 +16,10 @@
       ],
       "description": "Difficulty level"
     },
+    "damage_rating": {
+      "type": "number",
+      "description": "Damage severity rating from 1-10"
+    },
     "safety_warning": {
       "type": "string",
       "description": "Safety warnings if applicable"
@@ -37,6 +41,44 @@
             "type": "string"
           },
           "search_url": {
+            "type": "string"
+          },
+          "local_store_prices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "store": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "string"
+                },
+                "distance_miles": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "nearby_professionals": {
+      "type": "array",
+      "description": "Nearby professionals who can fix this",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "specialty": {
+            "type": "string"
+          },
+          "estimated_cost": {
             "type": "string"
           }
         }

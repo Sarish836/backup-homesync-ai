@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertTriangle, ShieldAlert, ExternalLink, Clock, DollarSign, Phone, Store } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const difficultyConfig = {
@@ -37,7 +37,21 @@ export default function RepairCard({ job }) {
               <h3 className="font-heading font-semibold text-foreground">{job.title}</h3>
               <p className="text-xs text-muted-foreground mt-0.5">{job.description}</p>
             </div>
-            <Badge className={`${config.color} border-0 text-[10px] shrink-0 ml-2`}>{config.label}</Badge>
+            <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+              <Badge className={`${config.color} border-0 text-[10px]`}>{config.label}</Badge>
+              {job.damage_rating != null && (
+                <div className="flex items-center gap-1">
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                      <div key={n} className={`w-1.5 h-3 rounded-sm ${n <= job.damage_rating
+                        ? job.damage_rating >= 8 ? 'bg-destructive' : job.damage_rating >= 5 ? 'bg-accent' : 'bg-primary'
+                        : 'bg-muted'}`} />
+                    ))}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">{job.damage_rating}/10</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-3 mt-3 text-xs text-muted-foreground">
@@ -53,18 +67,53 @@ export default function RepairCard({ job }) {
           {job.parts_list?.length > 0 && (
             <div className="mt-3 pt-3 border-t border-border/50">
               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Parts Needed</p>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {job.parts_list.map((part, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-sm bg-muted/50 rounded-lg p-2">
-                    <span className="text-foreground">{part.name}</span>
-                    <div className="flex items-center gap-2">
-                      {part.estimated_cost && <span className="text-xs text-muted-foreground">{part.estimated_cost}</span>}
-                      {part.search_url && (
-                        <a href={part.search_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
+                  <div key={idx} className="bg-muted/50 rounded-lg p-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{part.name}</span>
+                      <div className="flex items-center gap-2">
+                        {part.estimated_cost && <span className="text-xs text-muted-foreground">{part.estimated_cost}</span>}
+                        {part.search_url && (
+                          <a href={part.search_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
                     </div>
+                    {part.local_store_prices?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {part.local_store_prices.map((s, i) => (
+                          <span key={i} className="flex items-center gap-1 text-[10px] bg-background border border-border px-1.5 py-0.5 rounded">
+                            <Store className="w-2.5 h-2.5 text-muted-foreground" />
+                            {s.store} <strong>{s.price}</strong>
+                            {s.distance_miles && <span className="text-muted-foreground">· {s.distance_miles}mi</span>}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Nearby professionals */}
+          {job.nearby_professionals?.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-border/50">
+              <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider mb-2">Professionals Near You</p>
+              <div className="space-y-1.5">
+                {job.nearby_professionals.map((pro, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-destructive/5 border border-destructive/10 rounded-lg p-2">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{pro.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{pro.specialty}{pro.estimated_cost ? ` · ${pro.estimated_cost}` : ''}</p>
+                    </div>
+                    {pro.phone && (
+                      <a href={`tel:${pro.phone}`} className="flex items-center gap-1 text-xs text-primary font-medium hover:underline shrink-0 ml-2">
+                        <Phone className="w-3.5 h-3.5" /> {pro.phone}
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>

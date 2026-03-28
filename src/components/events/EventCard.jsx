@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Clock, CheckSquare, Square, Navigation } from 'lucide-react';
+import { MapPin, Clock, CheckSquare, Square, Navigation, Car } from 'lucide-react';
 import { format } from 'date-fns';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -54,8 +54,23 @@ export default function EventCard({ event }) {
             )}
           </div>
 
+          {/* Travel time reminder */}
+          {(event.travel_time_minutes || event.leave_by_time) && (
+            <div className="mt-3 p-2.5 bg-primary/5 rounded-xl border border-primary/10 flex items-center gap-2">
+              <Car className="w-4 h-4 text-primary shrink-0" />
+              <div className="text-xs">
+                {event.leave_by_time && (
+                  <span className="font-semibold text-foreground">Leave by {event.leave_by_time}</span>
+                )}
+                {event.travel_time_minutes && (
+                  <span className="text-muted-foreground ml-1">· ~{event.travel_time_minutes} min drive</span>
+                )}
+              </div>
+            </div>
+          )}
+
           {mapsUrl && (
-            <Button size="sm" variant="outline" className="mt-3 h-8 text-xs w-full" asChild>
+            <Button size="sm" variant="outline" className="mt-2 h-8 text-xs w-full" asChild>
               <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
                 <Navigation className="w-3.5 h-3.5 mr-1.5" /> Open in Google Maps
               </a>

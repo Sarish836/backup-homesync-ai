@@ -24,21 +24,48 @@ export default function BillAuditor() {
   const handleFileUploaded = async (fileUrl) => {
     setProcessing(true);
     const analysis = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a bill auditor AI. Analyze this bill image/document thoroughly.
-Extract all line items, identify the company name, determine the bill category (utility, medical, internet, insurance, or other).
-Compare each charge against typical market rates. Flag any potential overcharges, junk fees, administrative fees that seem excessive, or medical upcoding.
-Provide a customer service phone number if visible on the bill (or your best guess for the company).
-Write a polite but firm negotiation script the user can read when calling to dispute overcharges.
+      prompt: `You are a medical and household bill auditor AI. Analyze this bill document thoroughly.
 
-Be specific about WHY each flagged item is an overcharge and what the fair price should be.`,
+1. IDENTIFY: Company/hospital name, bill category (utility, medical, internet, insurance, other), all line items with charge codes if present.
+
+2. FOR MEDICAL BILLS specifically:
+   - Cross-reference each charge against typical hospital CDM (Chargemaster) rates for that procedure/service.
+   - Check if insurance paid the correct contracted rate. If there's an EOB (Explanation of Benefits), verify the insurance payment matches what they should pay under typical PPO/HMO rates.
+   - Flag any upcoding, duplicate billing, unbundling, or charges for services not rendered.
+   - Identify the specific hospital/provider name and look up their billing department phone number.
+
+3. FOR ALL BILLS:
+   - Compare each charge against fair market rates.
+   - Flag junk fees, excessive admin charges, and overcharges.
+   - Provide a firm but polite negotiation script tailored to the specific company and issues found.
+   - Include the customer service/billing department phone number (extract from bill or use known number for the company).
+
+Be very specific - name the hospital, name each problematic charge, cite CDM rates, and explain exactly what insurance should have covered.`,
       file_urls: [fileUrl],
       response_json_schema: {
         type: "object",
         properties: {
-          title: { type: "string", description: "Company or bill name" },
+          title: { type: "string", description: "Company or hospital name" },
           category: { type: "string", enum: ["utility", "medical", "internet", "insurance", "other"] },
           total_amount: { type: "number" },
           potential_savings: { type: "number" },
+          hospital_name: { type: "string", description: "Hospital or provider name if medical" },
+          insurance_paid: { type: "number", description: "Amount insurance actually paid" },
+          insurance_should_pay: { type: "number", description: "Amount insurance should pay based on CDM" },
+          cdm_issues: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                charge_code: { type: "string" },
+                description: { type: "string" },
+                billed_amount: { type: "number" },
+                cdm_rate: { type: "number" },
+                insurance_paid: { type: "number" },
+                issue: { type: "string" }
+              }
+            }
+          },
           line_items: {
             type: "array",
             items: {
@@ -52,7 +79,7 @@ Be specific about WHY each flagged item is an overcharge and what the fair price
               }
             }
           },
-          company_phone: { type: "string" },
+          company_phone: { type: "string", description: "Billing/customer service phone number" },
           negotiation_script: { type: "string" }
         }
       }
@@ -70,13 +97,11 @@ Be specific about WHY each flagged item is an overcharge and what the fair price
 
   return (
     <div className="space-y-5">
-      {/* Header */}
       <div>
         <h2 className="font-heading font-bold text-xl text-foreground">Bill Auditor</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Upload a bill to find hidden overcharges</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Upload a bill — we'll check CDM rates, insurance payments & overcharges</p>
       </div>
 
-      {/* Savings banner */}
       {totalSavings > 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -87,20 +112,18 @@ Be specific about WHY each flagged item is an overcharge and what the fair price
             <TrendingDown className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Total potential savings</p>
+            <p className="text-xs text-muted-foreground">Total potential savings identified</p>
             <p className="font-heading font-bold text-xl text-primary">${totalSavings.toFixed(2)}</p>
           </div>
         </motion.div>
       )}
 
-      {/* Upload */}
       <FileUploadZone
         onFileUploaded={handleFileUploaded}
-        label="Upload a bill to audit"
+        label="Upload a bill or EOB to audit"
         isProcessing={processing}
       />
 
-      {/* Bills list */}
       {isLoading ? (
         <div className="flex justify-center py-8">
           <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -109,7 +132,7 @@ Be specific about WHY each flagged item is an overcharge and what the fair price
         <EmptyState
           icon={Receipt}
           title="No bills analyzed yet"
-          description="Upload a utility, medical, internet, or insurance bill to get started"
+          description="Upload a medical bill, EOB, utility, or insurance statement to find overcharges"
         />
       ) : (
         <div className="space-y-3">

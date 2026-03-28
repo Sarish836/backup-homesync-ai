@@ -28,6 +28,38 @@
         }
       }
     },
+    "missing_staples": {
+      "type": "array",
+      "description": "Household staples that are missing from the fridge",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "expected_quantity": {
+            "type": "string"
+          },
+          "price_estimates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "store": {
+                  "type": "string"
+                },
+                "estimated_price": {
+                  "type": "string"
+                },
+                "distance_miles": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "recipes": {
       "type": "array",
       "description": "Suggested recipes",
@@ -81,6 +113,20 @@
           },
           "bought": {
             "type": "boolean"
+          },
+          "price_estimates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "store": {
+                  "type": "string"
+                },
+                "estimated_price": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }

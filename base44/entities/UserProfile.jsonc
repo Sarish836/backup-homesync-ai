@@ -1,0 +1,26 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "home_address": {
+      "type": "string",
+      "description": "User's home address"
+    },
+    "household_staples": {
+      "type": "array",
+      "description": "List of items that should always be in the house",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": []
+}

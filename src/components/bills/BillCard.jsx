@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Phone, FileText, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Phone, FileText, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const categoryLabels = {
@@ -51,6 +51,46 @@ export default function BillCard({ bill }) {
               {bill.status}
             </Badge>
           </div>
+
+          {/* Insurance discrepancy for medical bills */}
+          {bill.category === 'medical' && bill.insurance_should_pay != null && bill.insurance_paid != null && (
+            <div className="mt-3 p-3 bg-destructive/5 rounded-xl border border-destructive/10">
+              <div className="flex items-center gap-1.5 mb-1">
+                <ShieldAlert className="w-3.5 h-3.5 text-destructive" />
+                <span className="text-xs font-semibold text-destructive">Insurance Underpayment</span>
+              </div>
+              <div className="flex gap-4 text-xs">
+                <div>
+                  <span className="text-muted-foreground">Insurance paid: </span>
+                  <span className="font-semibold text-foreground">${bill.insurance_paid?.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Should pay: </span>
+                  <span className="font-semibold text-primary">${bill.insurance_should_pay?.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CDM issues */}
+          {bill.cdm_issues?.length > 0 && (
+            <div className="mt-2 space-y-1.5">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">CDM Rate Issues</p>
+              {bill.cdm_issues.map((issue, idx) => (
+                <div key={idx} className="flex justify-between text-xs bg-destructive/5 rounded-lg p-2 border border-destructive/10">
+                  <div>
+                    <span className="font-medium text-foreground">{issue.description}</span>
+                    {issue.charge_code && <span className="text-muted-foreground ml-1">({issue.charge_code})</span>}
+                    {issue.issue && <p className="text-destructive/80 mt-0.5">{issue.issue}</p>}
+                  </div>
+                  <div className="text-right shrink-0 ml-2">
+                    <p className="text-destructive line-through">${issue.billed_amount?.toFixed(2)}</p>
+                    <p className="text-primary">CDM: ${issue.cdm_rate?.toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Overcharges summary */}
           {overcharges.length > 0 && (

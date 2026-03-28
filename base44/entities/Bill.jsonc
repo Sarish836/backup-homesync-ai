@@ -25,6 +25,45 @@
       "type": "number",
       "description": "Estimated potential savings"
     },
+    "hospital_name": {
+      "type": "string",
+      "description": "Hospital or provider name (for medical bills)"
+    },
+    "insurance_paid": {
+      "type": "number",
+      "description": "Amount insurance actually paid"
+    },
+    "insurance_should_pay": {
+      "type": "number",
+      "description": "Amount insurance should have paid based on CDM"
+    },
+    "cdm_issues": {
+      "type": "array",
+      "description": "CDM discrepancies found",
+      "items": {
+        "type": "object",
+        "properties": {
+          "charge_code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "billed_amount": {
+            "type": "number"
+          },
+          "cdm_rate": {
+            "type": "number"
+          },
+          "insurance_paid": {
+            "type": "number"
+          },
+          "issue": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "line_items": {
       "type": "array",
       "description": "Extracted line items from the bill",
